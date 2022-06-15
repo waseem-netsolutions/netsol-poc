@@ -1,0 +1,61 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\wasee\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js
+
+PATH: 
+  C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\bin;C:\Program Files\OpenJDK\openjdk-11.0.14.1_1\bin;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\dotnet\;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files\Amazon\AWSCLIV2\;C:\Users\wasee\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\wasee\AppData\Local\Programs\Python\Python310\;C:\Users\wasee\AppData\Local\Microsoft\WindowsApps;C:\Users\wasee\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\wasee\AppData\Roaming\npm;C:\Users\wasee\AppData\Local\Yarn\bin;C:\Users\wasee\.dotnet\tools;C:\Program Files\heroku\bin
+
+Yarn version: 
+  1.22.18
+
+Node version: 
+  16.14.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/react-modal/-/react-modal-3.15.1.tgz: Request failed "502 Bad Gateway"
+      at ResponseError.ExtendableBuiltin (C:\Users\wasee\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:696:66)
+      at new ResponseError (C:\Users\wasee\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:802:124)
+      at Request.<anonymous> (C:\Users\wasee\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66208:16)
+      at Request.emit (node:events:520:28)
+      at Request.module.exports.Request.onRequestResponse (C:\Users\wasee\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141760:10)
+      at ClientRequest.emit (node:events:520:28)
+      at HTTPParser.parserOnIncomingClient (node:_http_client:618:27)
+      at HTTPParser.parserOnHeadersComplete (node:_http_common:128:17)
+      at HTTPParser.execute (<anonymous>)
+      at TLSSocket.socketOnData (node:_http_client:482:22)
+
+npm manifest: 
+  {
+    "name": "react",
+    "version": "0.0.0",
+    "private": true,
+    "dependencies": {
+      "classnames": "^2.3.1",
+      "final-form": "^4.20.7",
+      "firebase": "^9.8.3",
+      "lodash": "^4.17.21",
+      "moment": "^2.29.3",
+      "react": "^18.1.0",
+      "react-dom": "^18.1.0",
+      "react-final-form": "^6.5.9",
+      "react-modal": "^3.15.1",
+      "react-router-dom": "^6.3.0"
+    },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "test": "react-scripts test --env=jsdom",
+      "eject": "react-scripts eject"
+    },
+    "devDependencies": {
+      "react-scripts": "latest"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
