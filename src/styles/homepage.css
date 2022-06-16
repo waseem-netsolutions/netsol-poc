@@ -1,8 +1,16 @@
-.nav-center {
-  max-width: 1170px;
-  margin: 0 auto;
+.custom-banner {
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
+  height: 50vh;
+  width: 100vw;
+  background: linear-gradient(rgb(44, 174, 186, 0.7), rgba(0, 0, 0, 0.7)), url('https://html-css-flexbox-backroads-new-design.netlify.app/images/main.jpeg') center/cover no-repeat
+}
+
+.banner-fullscreen{
+  height: 100vh;
+}
+
+.custom-banner > h1 {
+  color: white;
 }

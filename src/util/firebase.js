@@ -28,28 +28,21 @@ export default app;
 
 //Methods to manipulate the db
 export const addEmployee = async (data) => {
-  console.log(data)
   try {
     const docRef = await addDoc(collection(db, "employees"), data);
-    console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e.message);
   }
 }
 
 export const getAllEmps = async (filterData) => {
-  const { nameOrder = 'asc', searchedEmail = "", perPage, startWith } = filterData;
-  //console.log(filterData, perPage, startWith)
+  const { nameOrder = 'asc'} = filterData;
   let q = query(collection(db, "employees"), orderBy("name", nameOrder));
-  if(searchedEmail){
-    q = query(collection(db, "employees"), where("email", "==", searchedEmail), orderBy("name", nameOrder));
-  }
   try{
     const querySnapshot = await getDocs(q);
     const dataArr = [];
     querySnapshot.forEach((doc) => {
       dataArr.push({...doc.data(), docId: doc.id })
-      //console.log(doc.id, " => ", doc.data());
     });
     return [dataArr, null];
   } catch(err){

@@ -1,23 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAllEmps, updateEmp, deleteEmp } from '../util/firebase';
 import { getTotalPagesInArray, paginateArray } from '../util/helpers';
 import ArrayPagination from './ArrayPagination';
-import Modal from 'react-modal';
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  },
-};
+import Modal from 'react-bootstrap/Modal';
+import Button from "react-bootstrap/Button";
+import Table from "react-bootstrap/Table";
+import { ArrowDown, ArrowUp, EyeFill, EyeSlash, EyeSlashFill } from 'react-bootstrap-icons';
+import { Form } from 'react-bootstrap';
+
+import "../styles/all-employees.css";
+import EditEmployeeModal from './EditEmployeeModal';
+import { ViewEmployeeModal } from './ViewEmployeeModal';
 
 let timeoutId = null;
 
 export default function AllEmployees(props) {
-  const { setRefresh, refresh } = props;
+  const { setRefresh, refresh, setModalIsOpen: setAddEmployeeModal } = props;
   const [data, setData] = useState(null);
   const [err, setErr] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -31,8 +29,11 @@ export default function AllEmployees(props) {
   const [perPage, setPerPage] = useState(5);
   const [email, setEmail] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [editModal, setEditModal] = useState(false);
+  const [viewEmpModal, setViewEmpModal] = useState(false);
+  const [currentEmp, setCurrentEmp] = useState({});
 
-  React.useEffect(() => {
+  useEffect(() => {
     const getData = async () => {
       const filterData = {
         nameOrder: asc ? 'asc' : 'desc',
@@ -40,7 +41,6 @@ export default function AllEmployees(props) {
       };
       const [data, err] = await getAllEmps(filterData);
       if (data) {
-        //console.log(data);
         setData(data);
       } else {
         setErr(err);
@@ -49,33 +49,14 @@ export default function AllEmployees(props) {
     getData();
   }, [refresh, asc]);
 
-  React.useEffect(() => {
-    const getData = async () => {
-      const filterData = {
-        nameOrder: asc ? 'asc' : 'desc',
-        searchedEmail: email,
-        perPage,
-      };
-      const [data, err] = await getAllEmps(filterData);
-      if (data) {
-        //console.log(data);
-        setData(data);
-      } else {
-        setErr(err);
-      }
-    };
-    getData();
-  }, [email]);
 
   const handleSave = async () => {
-    console.log(newData);
     await updateEmp(editId, newData);
     setEditId('');
     setRefresh((prev) => prev + 1);
   };
 
   const handleDelete = async () => {
-    //console.log(deleteId);
     await deleteEmp(deleteId);
     setRefresh((prev) => prev + 1);
     setModalIsOpen(false);
@@ -86,7 +67,7 @@ export default function AllEmployees(props) {
     setSearchEmail(e.target.value);
     timeoutId = setTimeout(() => {
       setEmail(e.target.value);
-    }, 2000);
+    }, 300);
   };
 
   const handlePagePrev = () => {
@@ -99,169 +80,53 @@ export default function AllEmployees(props) {
     setCurrentPage((cp) => cp + 1);
   };
 
-  const totalPages = getTotalPagesInArray(data, perPage);
+  let filteredData = data;
+  if(email){
+    filteredData = data?.filter(obj =>( obj.email.toLowerCase().includes(email.toLowerCase()) || obj.name.toLowerCase().includes(email.toLowerCase())))
+  }
+  const totalPages = getTotalPagesInArray(filteredData, perPage);
   return (
     <div>
-      <h2>List of Employees</h2>
-      <input
-        name="searchEmail"
-        placeholder="search by email"
-        value={searchEmail}
-        onChange={handleEmailChange}
-      />
-      <label htmlFor="perPage">Items per page</label>
-      <select
-        name="perPage"
-        id="perPage"
-        value={perPage}
-        onChange={(e) => setPerPage(e.target.value)}
-      >
-        <option value="" hidden>
-          Select items per page
-        </option>
-        <option value={5}>5</option>
-        <option value={10}>10</option>
-        <option value={15}>15</option>
-      </select>
-
-      <table style={{ border: 'solid', textAlign: 'center' }}>
+      <div className='table-div'>
+        <h2 className='align-center'>List of Employees</h2>
+        <div style={{display: "flex", justifyContent: "space-between"}}>
+          <Form.Group className="mb-3" style={{ width: "30%" }}>
+            <Form.Control
+              name="searchEmail"
+              placeholder="search by email or name"
+              value={searchEmail}
+              onChange={handleEmailChange}
+            />
+          </Form.Group>
+          <Button onClick={() => setAddEmployeeModal(true)} style={{height: "40px"}} variant='primary'>Add Employee</Button>
+        </div>
+      <Table striped bordered hover size="sm">
         <thead>
           <tr>
             <th>
               Name
-              <button onClick={() => setAsc((prev) => !prev)}>
-                {asc ? 'ASC' : 'DESC'}
-              </button>
+              <span style={{cursor: "pointer"}}onClick={() => setAsc((prev) => !prev)}>{ asc? <ArrowUp/> : <ArrowDown/> }</span>
             </th>
             <th>Email</th>
-            <th>DOB</th>
             <th>At-Work</th>
-            <th>Salary</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {!!data &&
-            paginateArray(data, perPage, currentPage).map((emp) => {
+          {!!filteredData &&
+            paginateArray(filteredData, perPage, currentPage).map((emp) => {
               const { docId, name, email, atWork, salary, dob } = emp;
-              if (editId === docId) {
-                return (
-                  <tr key={docId}>
-                    <td>
-                      <input
-                        type="text"
-                        name="name"
-                        value={newData.name}
-                        onChange={(e) =>
-                          setNewData((prev) => ({
-                            ...prev,
-                            [e.target.name]: e.target.value,
-                          }))
-                        }
-                      />
-                    </td>
-                    <td>{email}</td>
-                    <td>
-                      <input
-                        type="date"
-                        name="dob"
-                        value={newData.dob}
-                        onChange={(e) =>
-                          setNewData((prev) => ({
-                            ...prev,
-                            [e.target.name]: e.target.value,
-                          }))
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        name="atWork"
-                        checked={newData.atWork}
-                        onChange={(e) =>
-                          setNewData((prev) => ({
-                            ...prev,
-                            [e.target.name]: e.target.checked,
-                          }))
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        name="salary"
-                        value={newData.salary}
-                        onChange={(e) =>
-                          setNewData((prev) => ({
-                            ...prev,
-                            [e.target.name]: e.target.value,
-                          }))
-                        }
-                      />
-                    </td>
-                    <td>
-                      <button onClick={handleSave}>Save</button>
-                    </td>
-                  </tr>
-                );
-              }
               return (
                 <tr key={docId}>
                   <td>{name}</td>
                   <td>{email}</td>
+                  <td>{atWork ? 'Yes' : 'No'}</td>
                   <td>
-                    {showDob[docId] ? (
-                      <>
-                        {dob}
-                        <button
-                          onClick={() =>
-                            setShowDob((prev) => ({ ...prev, [docId]: false }))
-                          }
-                        >
-                          hide
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          setShowDob((prev) => ({ ...prev, [docId]: true }))
-                        }
-                      >
-                        show
-                      </button>
-                    )}
-                  </td>
-                  <td>{atWork ? 'Yes' : 'NO'}</td>
-                  <td>
-                    {showSalary[docId] ? (
-                      <>
-                        {salary}
-                        <button
-                          onClick={() =>
-                            setShowSalary((prev) => ({
-                              ...prev,
-                              [docId]: false,
-                            }))
-                          }
-                        >
-                          hide
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          setShowSalary((prev) => ({ ...prev, [docId]: true }))
-                        }
-                      >
-                        show
-                      </button>
-                    )}
-                  </td>
-                  <td>
-                    <button
+                    <Button variant='success' 
+                      style={{marginRight:"10px"}}
                       onClick={() => {
                         setEditId(docId);
+                        setEditModal(true);
                         setNewData({
                           name,
                           email,
@@ -272,23 +137,31 @@ export default function AllEmployees(props) {
                       }}
                     >
                       Edit
-                    </button>
-                    <button
+                    </Button>
+                    <Button variant='danger'
+                      style={{marginRight:"10px"}}
                       onClick={() => {
                         setDeleteId(docId);
                         setModalIsOpen(true);
                       }}
                     >
                       Delete
-                    </button>
+                    </Button>
+                    <Button variant='primary'
+                      onClick={() => {
+                        setCurrentEmp(emp);
+                        setViewEmpModal(true);
+                      }}
+                    >
+                      View
+                    </Button>
                   </td>
                 </tr>
               );
             })}
         </tbody>
-      </table>
-      <div>
-        <ArrayPagination
+      </Table>
+      <ArrayPagination
           pagination={{ page: currentPage, totalPages }}
           setCurrentPage={setCurrentPage}
           handlePageNext={handlePageNext}
@@ -296,32 +169,48 @@ export default function AllEmployees(props) {
         />
       </div>
       <Modal
-        ariaHideApp={false}
-        isOpen={modalIsOpen}
-        //onAfterOpen={afterOpenModal}
-        onRequestClose={() => {
+        show={modalIsOpen}
+        onHide={() => {
           setModalIsOpen(false);
           setDeleteId('');
         }}
-        style={customStyles}
+        size="md"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
       >
-        <h2>Alert</h2>
-        <div>Are you sure?</div>
-        <form>
-          <button type="button" onClick={handleDelete}>
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
             Delete
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setModalIsOpen(false);
-              setDeleteId('');
-            }}
-          >
-            Cancel
-          </button>
-        </form>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+           Are you sure you want to delete this item?
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleDelete}>Yes</Button>
+          <Button onClick={() => {
+            setModalIsOpen(false);
+            setDeleteId('');
+          }}>Cancel</Button>
+        </Modal.Footer>
       </Modal>
+      
+      <EditEmployeeModal
+        editModal={editModal}
+        setEditModal={setEditModal}
+        handleSave={handleSave}
+        newData={newData}
+        setNewData={setNewData}
+      />
+
+      <ViewEmployeeModal 
+        setViewEmpModal={setViewEmpModal}
+        viewEmpModal={viewEmpModal}
+        currentEmp={currentEmp}
+      />
+
     </div>
   );
 }

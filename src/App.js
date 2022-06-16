@@ -7,10 +7,9 @@ import LoginPage from './pages/LoginPage';
 import ProtectedPage from './pages/ProtectedPage';
 import { useAuth } from './contexts/AuthContext';
 //import './styles/bootstrap.min.css';
-//import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 export default function App() {
   const { currentUser } = useAuth();
-  //console.log(currentUser);
   return (
     <Router>
       <Routes>
@@ -18,9 +17,7 @@ export default function App() {
           exact
           path="/"
           element={
-            <ProtectedPage currentUser={currentUser}>
               <HomePage />
-            </ProtectedPage>
           }
         />
         <Route exact path="/signup" element={<SignupPage />} />
