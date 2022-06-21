@@ -68,7 +68,7 @@ const SearchComponent = (props) => {
       <MessageSearch
         searchString={searchString}
         channelUrl={currentChannelUrl}
-        onResultClick={(msg) => setSelectedMessage(msg.messageId)}
+        onResultClick={(msg) => {console.log(msg), setSelectedMessage(msg.messageId)}}
       />
     </div>
   )

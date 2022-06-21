@@ -6,7 +6,7 @@
 }
 
 .channel-list{
-  width: 40%;
+  width: auto;
   height: calc(100% - 52px);
 }
 
@@ -103,4 +103,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.archive-controls-div{
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  justify-content: center;
+  align-items: center;
+}
+.archive-controls-div > button{
+  display: inline-block;
 }

@@ -4,3 +4,4 @@ export { default as ArrayPagination } from './ArrayPagination';
 export { default as Topbar } from "./Topbar";
 export { default as SearchComponent } from "./SearchComponent";
 export { default as GroupsComponent } from "./GroupsComponent";
+export { default as MyCustomPreview } from "./MyCustomPreview";

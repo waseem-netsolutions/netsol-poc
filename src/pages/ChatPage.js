@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { GroupsComponent, SearchComponent, Topbar } from '../components'
+import { GroupsComponent, MyCustomPreview, SearchComponent, Topbar } from '../components'
 import { App as SendbirdApp } from 'sendbird-uikit'
 import {
   Channel as SBConversation,
@@ -15,6 +15,7 @@ import "sendbird-uikit/dist/index.css";
 import "../styles/chatpage.css";
 import { debounce, groupBy, set } from 'lodash';
 import produce from 'immer';
+import { Button } from 'react-bootstrap';
 const ChatPage = (props) => {
   //console.log(props)
   const { config, dispatchers, stores } = props;
@@ -30,10 +31,12 @@ const ChatPage = (props) => {
   const [searchString, setSearchString] = useState("");
   const [selectedMessage, setSelectedMessage] = useState("");
   const [messagesType, setMessagesType] = useState("");
+  const [archiveFilter, setArchiveFilter] = useState("unhidden_only");
+
   const [queries, setQueries] = useState({
     channelListQuery: {
-      customTypesFilter :[""],
-      //hiddenChannelFilter : "HIDDEN"
+      //customTypesFilter :[""],
+      hiddenChannelFilter: archiveFilter
     }
   })
   const [messagesFilterQuery, setMessagesFilterQuery] = useState({
@@ -47,23 +50,26 @@ const ChatPage = (props) => {
       return;
     }
     const groupChannelListQuery = sdk.GroupChannel.createMyGroupChannelListQuery();
-    //groupChannelListQuery.customTypesFilter  = [group];
+    groupChannelListQuery.hiddenChannelFilter = archiveFilter;
     groupChannelListQuery.next(function (groupChannels, error) {
       if (error) {
+        console.log("***err in useEffect", error)
         return;
       }
       console.log(groupChannels)
       groupChannels = groupChannels.map(c => c.customType ? c : ({ ...c, customType: "ungrouped"}));
+
       const channelsMap =  groupBy(groupChannels, item => item.customType)
       setGroups(Object.keys(channelsMap));
       if (groups.length > 0) {
         setSelectedGroup("ungrouped");
+        setCurrentChannelUrl(groupChannels[0]?.url)
         setQueries(produce(draft => {
           draft.channelListQuery.customTypesFilter = ['ungrouped']
         }))
       }
     });
-  }, [sdk]);
+  }, [sdk, archiveFilter]);
 
   const handleOnBeforeCreateChannel = (selectedUsers) => {
     const channelParams = new sdk.GroupChannelParams();
@@ -118,12 +124,35 @@ const ChatPage = (props) => {
       draft.channelListQuery.customTypesFilter = [group === "ungrouped" ? "" : group]
     }))
   }
+
+  const handleShowUnarchived = () => {
+    setQueries(produce(draft => { draft.channelListQuery.hiddenChannelFilter = "unhidden_only"}));
+    setArchiveFilter("unhidden_only")
+  }
+  const handleShowArchived = () => {
+    setQueries(produce(draft => { draft.channelListQuery.hiddenChannelFilter = "hidden_only"}));
+    setArchiveFilter("hidden_only")
+  }
+
   return (
     <div>
       <Topbar />
       <div className='app-area'>
         <div className='channel-list'>
+          <div className='archive-controls-div'>
+            <Button style={{marginRight: "20px"}} onClick={handleShowUnarchived} variant="outline-primary">Unarchived</Button>
+            <Button onClick={handleShowArchived} variant="outline-primary">Archived</Button>
+          </div>
           <SBChannelList
+            renderChannelPreview={({ channel, onLeaveChannel }) => <MyCustomPreview 
+              channel={channel}
+              onLeaveChannel={onLeaveChannel}
+              setCurrentChannelUrl={setCurrentChannelUrl}
+              setQueries={setQueries}
+              setArchiveFilter={setArchiveFilter}
+              setSelectedGroup={setSelectedGroup}
+              selectedGroup={selectedGroup}
+            />}
             queries={queries}
             onChannelSelect={(channel) => {
               if (channel && channel.url) {
