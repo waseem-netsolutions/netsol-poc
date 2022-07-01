@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { auth } from '../util/firebase';
+import { auth, getUser } from '../util/firebase';
 
 import {
   createUserWithEmailAndPassword,
@@ -24,14 +24,29 @@ export default function AuthProvider({ children }) {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
+  async function otherLogin(email){
+      const [data, err] = await getUser(email);
+      if(data.length){
+        setCurrentUser(data[0]);
+        localStorage.setItem('user', JSON.stringify(data[0]));
+        localStorage.setItem("userType", "other-user");
+      }
+      return [data, err];
+  }
+
   function logout() {
+    localStorage.setItem('user', null);
+    localStorage.setItem("userType", null);
+    setCurrentUser(null)
     return signOut(auth);
   }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      localStorage.setItem('user', JSON.stringify(user));
+      if(localStorage.getItem("userType") !== "other-user"){
+        setCurrentUser(user);
+        localStorage.setItem('user', JSON.stringify(user));
+      }
     });
 
     return unsubscribe;
@@ -42,6 +57,7 @@ export default function AuthProvider({ children }) {
     login,
     signup,
     logout,
+    otherLogin
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

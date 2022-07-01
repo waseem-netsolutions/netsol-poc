@@ -1,24 +1,28 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { GroupsComponent, MyCustomPreview, SearchComponent, Topbar } from '../components'
+import { CustomMessageItem, GroupsComponent, MyCustomPreview, SearchComponent, Topbar } from '../components'
 import { App as SendbirdApp } from 'sendbird-uikit'
 import {
   Channel as SBConversation,
   ChannelList as SBChannelList,
   ChannelSettings as SBChannelSettings,
-  MessageSearch,
   useSendbirdStateContext, 
   sendBirdSelectors,
   withSendBird
 } from "sendbird-uikit";
 
-import "sendbird-uikit/dist/index.css";
+import ArchiveErrorBoundary from "../error-boundaries/ArchiveErrorBoundary";
+// import "sendbird-uikit/dist/index.css";
+import "../styles/sendbird.css";
 import "../styles/chatpage.css";
 import { debounce, groupBy, set } from 'lodash';
 import produce from 'immer';
 import { Button } from 'react-bootstrap';
+import { getSimilarUsers } from '../util/firebase';
+import CustomHeader from '../components/SendbirdComponents/CustomChannelListHeader';
+import CustomChatHeader from '../components/SendbirdComponents/CustomConversationHeader';
 const ChatPage = (props) => {
   //console.log(props)
-  const { config, dispatchers, stores } = props;
+  const { config, dispatchers, stores, currentUser } = props;
   const { sdkStore: { sdk }, userStore: { user } } = stores; 
   //const context = useSendbirdStateContext();
   //const sdk = sendBirdSelectors.getSdk(context);
@@ -32,11 +36,15 @@ const ChatPage = (props) => {
   const [selectedMessage, setSelectedMessage] = useState("");
   const [messagesType, setMessagesType] = useState("");
   const [archiveFilter, setArchiveFilter] = useState("unhidden_only");
+  const [similarUsers, setSimilarUsers] = useState([]);
 
   const [queries, setQueries] = useState({
     channelListQuery: {
       //customTypesFilter :[""],
       hiddenChannelFilter: archiveFilter
+    },
+    applicationUserListQuery: {
+      userIdsFilter: []
     }
   })
   const [messagesFilterQuery, setMessagesFilterQuery] = useState({
@@ -44,6 +52,22 @@ const ChatPage = (props) => {
       messageType: ""
     }
   })
+
+  useEffect(() => {
+    const fetchSimilarUser = async () => {
+      const [data, err] = await getSimilarUsers(currentUser);
+      if(data){
+        setSimilarUsers(data);
+        //console.log("similardata",data)
+        setQueries(produce(draft => {
+          draft.applicationUserListQuery.userIdsFilter = data.map(user => user.email)
+        }))
+      }
+    }
+    if(currentUser){
+      fetchSimilarUser();
+    }
+  }, [currentUser])
 
   useEffect(() => {
     if (!sdk || !sdk.GroupChannel) {
@@ -56,29 +80,30 @@ const ChatPage = (props) => {
         console.log("***err in useEffect", error)
         return;
       }
-      console.log(groupChannels)
+      console.log( "group channells list", groupChannels)
       groupChannels = groupChannels.map(c => c.customType ? c : ({ ...c, customType: "ungrouped"}));
 
       const channelsMap =  groupBy(groupChannels, item => item.customType)
       setGroups(Object.keys(channelsMap));
       if (groups.length > 0) {
-        setSelectedGroup("ungrouped");
+        setSelectedGroup(groups[0]);
         setCurrentChannelUrl(groupChannels[0]?.url)
         setQueries(produce(draft => {
-          draft.channelListQuery.customTypesFilter = ['ungrouped']
+          draft.channelListQuery.customTypesFilter = [groups[0]]
         }))
       }
     });
   }, [sdk, archiveFilter]);
 
   const handleOnBeforeCreateChannel = (selectedUsers) => {
+    const { isOwner = false, accountOwner = '', office = '', email } = currentUser;
     const channelParams = new sdk.GroupChannelParams();
     channelParams.addUserIds(selectedUsers);
-    channelParams.name = "My Channel";
-    channelParams.overUrl = null;
+    //channelParams.name = "My Channel";
     channelParams.coverImage = null;
-    channelParams.customType = "withData";
-    channelParams.data = JSON.stringify({name: "My Channel", type: "withData"});
+    channelParams.operatorUserIds = [email]
+    channelParams.customType = isOwner? "internal" : "external";
+    if(!isOwner) channelParams.data = JSON.stringify({ accountOwner, office });
     return channelParams;
   }
 
@@ -108,7 +133,7 @@ const ChatPage = (props) => {
   }
 
   const handleChatHeaderActionClick = () => {
-    setShowSettings(true);
+    setShowSettings(!showSettings);
     setOpenSearch(false);
     resetSearchInput();
   }
@@ -134,6 +159,39 @@ const ChatPage = (props) => {
     setArchiveFilter("hidden_only")
   }
 
+  const handleOnBeforeSendUserMessage = (text) => {
+    const { office } = currentUser || {};
+    const userMessageParams = new sdk.UserMessageParams();
+    const data = {
+      office
+    }
+    userMessageParams.data = JSON.stringify(data);
+    userMessageParams.message = text;
+    return userMessageParams
+  }
+  const handleOnBeforeSendFileMessage = (file) => {
+    const { office } = currentUser || {};
+    const fileMessageParam = new sdk.FileMessageParams();
+    const { type } = file;
+    fileMessageParam.file = file;
+    const data = {
+      office
+    }
+    fileMessageParam.data = JSON.stringify(data);
+    if (type.includes("image")) {
+      fileMessageParam.customType = "image";
+      fileMessageParam.thumbnailSizes = [{ maxWidth: 200, maxHeight: 200 }];
+    };
+    if (type.includes("video")) {
+      fileMessageParam.customType = "video";
+      fileMessageParam.thumbnailSizes = [{ maxWidth: 200, maxHeight: 200 }];
+    };
+    if (type.includes("text")) fileMessageParam.customType = "text";
+    if (type.includes("pdf")) fileMessageParam.customType = "document";
+    if (type.includes("officedocument")) fileMessageParam.customType = "document"
+    return fileMessageParam
+  }
+
   return (
     <div>
       <Topbar />
@@ -143,24 +201,35 @@ const ChatPage = (props) => {
             <Button style={{marginRight: "20px"}} onClick={handleShowUnarchived} variant="outline-primary">Unarchived</Button>
             <Button onClick={handleShowArchived} variant="outline-primary">Archived</Button>
           </div>
-          <SBChannelList
-            renderChannelPreview={({ channel, onLeaveChannel }) => <MyCustomPreview 
-              channel={channel}
-              onLeaveChannel={onLeaveChannel}
-              setCurrentChannelUrl={setCurrentChannelUrl}
-              setQueries={setQueries}
-              setArchiveFilter={setArchiveFilter}
-              setSelectedGroup={setSelectedGroup}
-              selectedGroup={selectedGroup}
-            />}
-            queries={queries}
-            onChannelSelect={(channel) => {
-              if (channel && channel.url) {
-                setCurrentChannelUrl(channel.url);
+          <ArchiveErrorBoundary>
+            <SBChannelList
+              // renderChannelPreview={({ channel, onLeaveChannel }) => <MyCustomPreview
+              //   channel={channel}
+              //   onLeaveChannel={onLeaveChannel}
+              //   setCurrentChannelUrl={setCurrentChannelUrl}
+              //   setQueries={setQueries}
+              //   setArchiveFilter={setArchiveFilter}
+              //   setSelectedGroup={setSelectedGroup}
+              //   selectedGroup={selectedGroup}
+              // />}
+              queries={queries}
+              onChannelSelect={(channel) => {
+                if (channel && channel.url) {
+                  setCurrentChannelUrl(channel.url);
+                }
+              }}
+              onBeforeCreateChannel={handleOnBeforeCreateChannel}
+              renderHeader={() => 
+                <CustomHeader
+                  similarUsers={similarUsers}
+                  currentUser={currentUser}
+                  sdk={sdk}
+                  setCurrentChannelUrl={setCurrentChannelUrl}
+                />
               }
-            }}
-            onBeforeCreateChannel={handleOnBeforeCreateChannel}
-          />
+            />
+          </ArchiveErrorBoundary>
+          
           <GroupsComponent
             groups={groups}
             handleGroupClick={handleGroupClick}
@@ -173,9 +242,31 @@ const ChatPage = (props) => {
             queries={messagesFilterQuery}
             highlightedMessage={selectedMessage}
             channelUrl={currentChannelUrl}
+            useReaction={false}
+            useMessageGrouping={false}
             showSearchIcon={true}
             onSearchClick={handleSearchIconClick}
             onChatHeaderActionClick={handleChatHeaderActionClick}
+            onBeforeSendFileMessage={handleOnBeforeSendFileMessage}
+            onBeforeSendUserMessage={handleOnBeforeSendUserMessage}
+            renderChatHeader={(props) => 
+              <CustomChatHeader
+                {...props}
+                onSearchClick={handleSearchIconClick}
+                onSettingsClick={handleChatHeaderActionClick}
+                onCallClick={f => f}
+                currentUser={currentUser}
+              />
+            }
+            renderChatItem={(props) => 
+              <CustomMessageItem 
+                {...props} 
+                currentUser={currentUser} 
+                setImageUrl={f => f} 
+                setImageViewer={f => f}
+                setHighlighedMessage={setSelectedMessage}
+              /> 
+            }
           />
         </div>
 

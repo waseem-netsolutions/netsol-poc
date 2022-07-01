@@ -115,3 +115,67 @@
 .archive-controls-div > button{
   display: inline-block;
 }
+
+.sendbird-channel-header__right-icon {
+  display: none;
+}
+
+/* Chat Header */
+.chatheader-container {
+  height: 62px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.chatheader-image-container {
+  height: 100%;
+  width: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chatheader-channel-name {
+  width: 50%;
+}
+
+.chatheader-channel-actions {
+  width: 25%;
+}
+
+.chatheader-image {
+  height: 50px;
+  width: 50px;
+  overflow: hidden;
+  border-radius: 15px;
+}
+.chatheader-image img {
+  height: 100%;
+  width: 100%;
+}
+
+.chatheader-channel-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.chatheader-channel-actions div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chatheader-channel-actions div span {
+  display: inline-block;
+  margin-right: 10px;
+  color:rgb(168, 207, 61);
+  padding: 10px;
+  cursor: pointer;
+}
+
+.chatheader-channel-actions div span:hover {
+  background-color: lightgray;
+  border-radius: 10px;
+}

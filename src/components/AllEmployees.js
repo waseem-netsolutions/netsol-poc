@@ -108,19 +108,19 @@ export default function AllEmployees(props) {
               <span style={{cursor: "pointer"}}onClick={() => setAsc((prev) => !prev)}>{ asc? <ArrowUp/> : <ArrowDown/> }</span>
             </th>
             <th>Email</th>
-            <th>At-Work</th>
+            <th>Is Owner</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {!!filteredData &&
             paginateArray(filteredData, perPage, currentPage).map((emp) => {
-              const { docId, name, email, atWork, salary, dob } = emp;
+              const { docId, name, email, isOwner, salary, dob } = emp;
               return (
                 <tr key={docId}>
                   <td>{name}</td>
                   <td>{email}</td>
-                  <td>{atWork ? 'Yes' : 'No'}</td>
+                  <td>{isOwner ? 'Yes' : 'No'}</td>
                   <td>
                     <Button variant='success' 
                       style={{marginRight:"10px"}}
@@ -131,7 +131,7 @@ export default function AllEmployees(props) {
                           name,
                           email,
                           dob,
-                          atWork,
+                          isOwner,
                           salary,
                         });
                       }}

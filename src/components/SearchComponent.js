@@ -28,6 +28,12 @@ const SearchComponent = (props) => {
     }))
   }
 
+  const handleSelectMessage = (msg) => {
+    setSelectedMessage(msg.messageId);
+    const el = document.getElementById(msg.messageId);
+    el?.scrollIntoView({block: "center", inline: "center", behavior: "smooth"});
+  }
+
   return (
     <div className='sendbird-channel-settings search-area'>
       <div className="sendbird-channel-settings__header">
@@ -68,7 +74,7 @@ const SearchComponent = (props) => {
       <MessageSearch
         searchString={searchString}
         channelUrl={currentChannelUrl}
-        onResultClick={(msg) => {console.log(msg), setSelectedMessage(msg.messageId)}}
+        onResultClick={handleSelectMessage}
       />
     </div>
   )

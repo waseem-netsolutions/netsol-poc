@@ -1,0 +1,181 @@
+.custom-header-container {
+  display: flex;
+  overflow: hidden;
+  height: 100%;
+}
+.custom-header-container .image-container {
+  width: 25%;
+}
+.custom-header-container .image {
+  overflow: hidden;
+  height: 47px;
+  width: 47px;
+  border-radius: 50%;
+  
+  /* margin-right: 10px; */
+}
+.custom-header-container .image img{
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.custom-header-container .info {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+.custom-header-container .info p {
+  padding: 0;
+  margin: 0;
+}
+.custom-header-container .info .name {
+  color: #577e85;
+  font-weight: 500;
+}
+
+.custom-header-container .info .office {
+  color: #87918c;
+}
+
+.custom-header-container .action-container {
+  width: 25%;
+}
+
+.custom-header-container .action-container .action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  cursor: pointer;
+}
+
+.add-users-form ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.add-users-form ul li {
+  display: flex;
+  align-items: center;
+  padding: 7px;
+  border-bottom: 2px solid #e2e9db;
+}
+
+.add-users-form ul li .info-section {
+  display: flex;
+  margin-left: 10px;
+}
+
+.add-users-form ul li .info-section .form-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 20px;
+}
+.add-users-form ul li .info-section .image {
+  overflow: hidden;
+  border-radius: 5px;
+  height: 50px;
+  width: 50px
+}
+
+.add-users-form ul li .info-section .image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.form-info-container p {
+  padding: 0;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.chat-header-form-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2f3144
+}
+
+.chat-header-form-email {
+  font-size: 16px;
+  color: #87918c
+}
+
+.chat-header-form-submit-section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.chat-header-form-submit-section button {
+  display: inline;
+  border: 0px;
+  background-color: #a8cf3d;
+  padding: 4px 20px;
+  border-radius: 20px;
+  color: white;
+}
+
+.chat-header-form-submit-section button:hover{
+  background-color: #87918c
+}
+
+/* Add group info form */
+.group-name-label {
+  color: #577e85;
+}
+.group-name-input {
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 3px solid #a8cf3d !important;
+
+}
+.image-upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.image-upload-center {
+  width: 30%;
+}
+
+.image-preview-container {
+  position: relative;
+}
+
+.image-preview-container > .image-preview {
+  overflow: hidden;
+  border-radius: 50%;
+  width: 100%;
+  height: 139.51px;
+}
+.image-preview-container  img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-upload-icon {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  width: 2rem;
+  height: 2rem;
+  background-color: #a8cf3d;
+  padding: 5px;
+  border-radius: 50%;
+  color: #e2e9db;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.upload-image-input {
+  display: none;
+}

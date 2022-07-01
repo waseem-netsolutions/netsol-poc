@@ -1,0 +1,37 @@
+1. Problems while archiving and unarchiving the group-channels
+=======================================================================
+If there is only one group-channel and you attempt to archive it, then there is an error in some reducer file.
+
+I am using the following channel method to archive or unarchive:
+==================================================================
+
+const archiveChannel = async () => {
+  await currentChannel.hide(false, false);
+}
+
+const unarchiveChannel = async () => {
+  await currentChannel.unhide()
+}
+
+
+Description of an error: 
+===============================
+reducers.js:138 Uncaught TypeError: Cannot read properties of undefined (reading 'url')
+    at reducer (reducers.js:138:1)
+    at updateReducer (react-dom.development.js:16664:1)
+    at Object.useReducer (react-dom.development.js:17898:1)
+    at useReducer (react.development.js:1626:1)
+    at ChannelList (index.jsx:71:1)
+    at renderWithHooks (react-dom.development.js:16305:1)
+    at updateFunctionComponent (react-dom.development.js:19588:1)
+    at beginWork (react-dom.development.js:21601:1)
+    at beginWork$1 (react-dom.development.js:27426:1)
+    at performUnitOfWork (react-dom.development.js:26557:1) 
+
+
+P.S : But, if there are more than one group-channels then archiving/unarchiving happens without any error
+    untill the last one. Then for the last one, the same error occurs again.
+
+2. We want to delete a message from a channel for a perticular user only. But others users in the channel 
+   should still be able to see that deleted message of a perticular user.
+   But, currently if a user deletes its message from a channel, it is deleted for all users in the channel.  

@@ -2,16 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import moment from 'moment';
 import { AddEmployeeForm, AllEmployees } from '../components';
-import { addEmployee } from '../util/firebase';
+import { addEmployee, getOwners } from '../util/firebase';
 import { Navbar, Container, Nav, Button, Modal } from "react-bootstrap";
 import "../styles/homepage.css"
-export default function HomePage() {
+export default function HomePage(props) {
 
-  const { currentUser, logout } = useAuth();
+  const {  logout } = useAuth();
+  const currentUser = JSON.parse(localStorage.getItem("user"));
   const [intervalId, setIntervalId] = useState();
   const [refresh, setRefresh] = useState(0);
   const [time, setTime] = useState();
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [owners, setOwners] = useState([]);
+  const [fetchOwnersError, setFetchOwnersError] = useState(null);
   const handleLogout = async () => {
     await logout();
   };
@@ -26,16 +29,38 @@ export default function HomePage() {
     };
   }, []);
 
+  useEffect(() => {
+    const getOwnersData = async () => {
+     
+        const [data, err] = await getOwners();
+        if(data) {
+          setOwners(data);
+        } else{
+          setFetchOwnersError(err)
+        }
+        //console.log(data)
+    }
+    if(currentUser){
+     getOwnersData()
+    }
+  }, [currentUser, refresh])
+
+  
+
   const handleSubmit = (values) => {
-    const { dob, email, name, salary, atWork = false, empId } = values;
+    const { dob, email, name, salary, isOwner = false, empId, accountOwner, office } = values;
     const data = {
       dob,
       email,
       name,
       salary,
-      atWork,
+      isOwner,
       empId
     };
+    if(!isOwner){
+      data.accountOwner = accountOwner;
+      data.office = office;
+    }
     addEmployee(data);
     setRefresh((prev) => prev + 1);
     setModalIsOpen(false);
@@ -48,7 +73,8 @@ export default function HomePage() {
         <Container>
           <Navbar.Brand href="/">Logo</Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="/">Home</Nav.Link>   
+            <Nav.Link href="/">Home</Nav.Link>  
+            <Nav.Link href="/chat">Chat</Nav.Link>  
           </Nav>
           <Nav>
           <Navbar.Text>{time}</Navbar.Text>
@@ -57,7 +83,8 @@ export default function HomePage() {
             <Button onClick={handleLogout}>Signout</Button> :
             (
                 <>
-                  <Nav.Link href="/login">Login</Nav.Link>
+                  <Nav.Link href="/login">Login-admin</Nav.Link>
+                  <Nav.Link href="/login-other">Login-other</Nav.Link>
                   <Nav.Link href="/signup">Signup</Nav.Link>
                 </>
             )  
@@ -84,7 +111,7 @@ export default function HomePage() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <AddEmployeeForm handleSubmit={handleSubmit} />
+          <AddEmployeeForm handleSubmit={handleSubmit} owners={owners}/>
         </Modal.Body>
       </Modal>
     </div>

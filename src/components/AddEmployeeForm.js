@@ -3,14 +3,19 @@ import validator from 'validator';
 import { Button, Form } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 const AddEmployeeForm = (props) => {
-  const { handleSubmit } = props;
+  const { handleSubmit, owners } = props;
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [dob, setDob] = useState('');
-  const [atWork, setAtWork] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const [salary, setSalary] = useState('');
   const [empId, setEmpId] = useState(null);
   const [err, setErr] = useState({});
+  const [accountOwner, setAccountOwener] = useState("");
+  const [office, setOffice] = useState("");
+
+
+
   const submit = (e) => {
     e.preventDefault();
     let hasError = false;
@@ -51,15 +56,19 @@ const AddEmployeeForm = (props) => {
       email,
       dob,
       salary,
-      atWork,
+      isOwner,
       empId
+    }
+    if(!isOwner){
+      values.accountOwner = accountOwner;
+      values.office = office
     }
     handleSubmit(values);
     setEmail("");
     setName("");
     setDob("");
     setSalary("");
-    setAtWork(false);
+    setIsOwner(false);
     setErr({})
   }
 
@@ -143,18 +152,42 @@ const AddEmployeeForm = (props) => {
               />
               {err.dob ? <span style={{color: "red"}}>{err.dob}</span> : null}
             </Form.Group>
-            
+
             <Form.Group className="mb-3">
               <Form.Check
                 type="checkbox"
-                id="atWork"
-                name="atWork"
-                checked={atWork}
-                onChange={() => setAtWork(!atWork)}
-                label="At work"
+                id="isOwner"
+                name="isOwner"
+                checked={isOwner}
+                onChange={() => setIsOwner(!isOwner)}
+                label="Is Owner"
               />
             </Form.Group>
-        
+            
+            {(owners.length && !isOwner)? <>
+              <label htmlFor="accountOwner">Which A/c Owner</label> &nbsp; &nbsp;
+              <select name="accountOwner" id="accountOwner" defaultValue={accountOwner} onChange={(e) => setAccountOwener(e.target.value)}>
+                <option value="" hidden>Select a/c owner</option>
+                {owners.map(item => {
+                  const { name, email } = item;
+                  return (
+                    <option key={email} value={email}>{name}</option>
+                  )
+                })}
+              </select>
+              <br />
+              <br />
+              <label htmlFor="office">Which Office</label> &nbsp; &nbsp;
+              <select name="office" id="office" defaultValue={office} onChange={(e) => setOffice(e.target.value)}>
+                <option value="" hidden>Select office</option>
+                <option value="office1"> Office 1</option>
+                <option value="office2">Office 2</option>
+              </select>
+              <br />
+              <br />
+            </> : null}
+           
+              
             <Form.Group className="mb-3">
               <Form.Label htmlFor="salary">Salary</Form.Label>
               <Form.Control 

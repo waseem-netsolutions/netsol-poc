@@ -1,0 +1,229 @@
+.own-message-container{
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.other-message-container{
+  display: flex;
+  justify-content: flex-start;
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+.message-options-container {
+  position: relative;
+}
+
+.message-options {
+  position: absolute;
+  right: 100%;
+}
+
+.message-options ul {
+  font-size: 15px;
+  border: 1px rgb(0, 0, 0, 0.5) solid;
+  box-shadow: 0 3px 5px -3px rgba(33, 34, 66, 0.04), 0 3px 14px 2px rgba(0, 0, 0, 0.08), 0 8px 10px 1px rgba(0, 0, 0, 0.12);
+  padding: 8px 0px;
+  border-radius: 4px;
+  list-style: none;
+  padding: 8px 0px;
+  background-color: #FFFFFF;
+  min-width: 120px
+}
+
+.message-options ul li {
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 2px 16px;
+}
+
+.message-options ul li:hover{
+  background-color: grey;
+}
+
+.textarea-container {
+  text-align: right;
+}
+.textarea-container textarea{
+  border-radius: 20px 20px 0 20px;
+  font-size: small;
+  padding-left: 10px;
+  padding-top: 10px;
+  width: 100%;
+  outline: none;
+}
+
+.edit-action-btn {
+  display: inline-block;
+  cursor: pointer;
+  background-color: #a8cf3d;
+  min-width: 50px;
+  padding: 5px 25px;
+  border-radius: 20px;
+  font-size: 15px;
+}
+
+.cancel-edit-btn {
+  margin-right: 10px;
+}
+
+.edit-actions-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.show {
+  opacity: 1;
+}
+
+.hide {
+  opacity: 0;
+}
+
+.text-message-area{
+  width: 60%;
+  padding: 10px 20px 10px 30px;
+  margin: 5px 0;
+}
+.text-message-area-incoming{
+  background-color: rgb(255, 255, 255);
+  border-radius: 20px 20px 20px 0px;
+  color: black;
+}
+.text-message-area-outgoing{
+  background-color: rgb(87, 126, 133);
+  border-radius: 20px 20px 0 20px;
+  color: white;
+  overflow: hidden;
+}
+
+.text-message-area-outgoing .text-message-date{
+  display: block;
+  color: rgb(170, 190, 193);
+  text-align: right;
+  margin-top: 5px;
+}
+
+.text-message-area-incoming .text-message-date{
+  display: block;
+  color:  rgb(135, 145, 140);
+  text-align: right;
+  margin-top: 5px;
+}
+
+.highlighted-message{
+  background-color: rgb(168, 207, 61);
+}
+.highlighted-message .text-message-date{
+  color: black
+}
+
+.own-message-container .image-container{
+  width: 250px;
+  height: 250px;
+}
+
+.other-message-container .image-container{
+  width: 250px;
+  height: 250px;
+}
+
+.image-container img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+.text-message-area-outgoing .download-icon{
+  color: white;
+}
+
+.text-message-area-outgoing .document-name{
+  color: white;
+  text-decoration: underline;
+}
+
+.text-message-area-incoming .download-icon{
+  color: black;
+}
+
+.text-message-area-incoming .document-name{
+  color: black;
+  text-decoration: underline;
+}
+
+.video-container{
+  width: 350px;
+  height: 250px;
+}
+
+.video-container div img {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.video-play-btn{
+  position: absolute;
+  font-size: 100px;
+  top: 50%;
+  left: 50%;
+  color: #a8cf3d;
+  font-size: 109px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: all .6s;
+}
+
+.video-play-btn:hover {
+  font-size: 120px;
+}
+.video-container > div {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.video-container video{
+  border-radius: 20px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-name-container{
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.user-name-container .name .office {
+  display: inline-block;
+}
+.user-name-container .name {
+ color:#a8cf3d
+}
+
+.user-name-container .office {
+  color: rgb(170, 190, 193);
+}
+
+.media-btns {
+  margin-right: 10px;
+  background-color: #FFFFFF;
+  color: black
+}
+
+.media-btn-filled {
+  background-color: #007bff;
+}
+
+.edited-flag {
+  font-size: 14px;
+  color: rgb(170, 190, 193)
+}

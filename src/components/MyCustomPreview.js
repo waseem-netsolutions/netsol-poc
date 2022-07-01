@@ -14,6 +14,7 @@ const MyCustomPreview = (props) => {
     selectedGroup
   } = props;
 
+  console.log(channel)
   if (channel.customType === "") {
     if (selectedGroup !== "ungrouped") return null
   } else {

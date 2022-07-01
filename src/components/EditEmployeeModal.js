@@ -3,7 +3,7 @@ import { Button, Form, Modal } from "react-bootstrap"
 
 const EditEmployeeModal = (props) => {
   const { editModal, setEditModal, handleSave, newData, setNewData } = props;
-  const { name, dob, salary, atWork } = newData;
+  const { name, dob, salary, isOwner } = newData;
   const [err, setErr] = useState({});
 
   const handleSubmit = (e) => {
@@ -35,7 +35,7 @@ const EditEmployeeModal = (props) => {
       name,
       dob,
       salary,
-      atWork
+      isOwner
     }
     handleSave(values);
     setErr({})
@@ -146,13 +146,13 @@ const EditEmployeeModal = (props) => {
           <Form.Group className="mb-3">
             <Form.Check
               type="checkbox"
-              id="atWork"
-              name="atWork"
-              checked={atWork}
+              id="isOwner"
+              name="isOwner"
+              checked={isOwner}
               onChange={(e) => {
                 updateData(e);
               }}
-              label="At work"
+              label="Is Owner"
             />
           </Form.Group>
 

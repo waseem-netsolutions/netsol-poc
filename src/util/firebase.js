@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
+import axios from "axios"
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, orderBy, limit, startAt } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
@@ -29,6 +30,14 @@ export default app;
 //Methods to manipulate the db
 export const addEmployee = async (data) => {
   try {
+    try {
+      const res = await axios.get("https://randomuser.me/api/?inc=picture");
+      const apiData = res.data;
+      const imageUrl = apiData?.results?.[0]?.picture?.medium;
+      data.imageUrl = imageUrl;
+    } catch (error) {
+      console.log("error while getting random image")
+    }
     const docRef = await addDoc(collection(db, "employees"), data);
   } catch (e) {
     console.error("Error adding document: ", e.message);
@@ -51,8 +60,72 @@ export const getAllEmps = async (filterData) => {
   }
 }
 
+export const getOwners = async () => {
+  let q = query(collection(db, "employees"), where("isOwner", "==", true));
+  try{
+    const querySnapshot = await getDocs(q);
+    const dataArr = [];
+    querySnapshot.forEach((doc) => {
+      dataArr.push({...doc.data(), docId: doc.id })
+    });
+    return [dataArr, null];
+  } catch(err){
+    console.error("***GEt all owners error", err.message);
+    return [null, err.message];
+  }
+}
+
+export const getUser = async (email) => {
+  let q = query(collection(db, "employees"), where("email", "==", email));
+  try{
+    const querySnapshot = await getDocs(q);
+    const dataArr = [];
+    querySnapshot.forEach((doc) => {
+      dataArr.push({...doc.data(), docId: doc.id })
+    });
+    return [dataArr, null];
+  } catch(err){
+    console.error("***GEt user error", err.message);
+    return [null, err.message];
+  }
+}
+
+export const getSimilarUsers = async (currentUser) => {
+  const { isOwner, accountOwner, office } = currentUser;
+  console.log({isOwner, accountOwner, office});
+  let q;
+  if (isOwner) {
+    q = query(collection(db, "employees"), where("isOwner", "==", true));
+  } else {
+    q = query(collection(db, "employees"), 
+          where("isOwner", "==", false), 
+          where("accountOwner", "==", accountOwner), 
+          //where("office", "==", office)
+        );
+  }
+  try {
+    const querySnapshot = await getDocs(q);
+    const dataArr = [];
+    querySnapshot.forEach((doc) => {
+      dataArr.push({ ...doc.data(), docId: doc.id })
+    });
+    return [dataArr, null];
+  } catch (err) {
+    console.error("***GEt owner error", err.message);
+    return [null, err.message];
+  }
+}
+
 export const updateEmp = async (docId, data) => {
   try {
+    try {
+      const res = await axios.get("https://randomuser.me/api/?inc=picture");
+      const apiData = res.data;
+      const imageUrl = apiData?.results?.[0]?.picture?.medium;
+      data.imageUrl = imageUrl;
+    } catch (error) {
+      console.log("error while getting random image")
+    }
     const docRef = doc(db, 'employees', docId);
     await updateDoc(docRef, data);
   } catch (err) {
