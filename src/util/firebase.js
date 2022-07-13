@@ -2,6 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import axios from "axios"
 import { getAuth } from 'firebase/auth';
+import { getMessaging } from 'firebase/messaging';
 import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, orderBy } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -20,6 +21,11 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+//* GET FIREBASE MESSAGING INSTANCE
+const messaging = getMessaging(app);
+
+
 export const db = getFirestore(app);
 
 // Initialize Firebase Authentication and get a reference to the service
