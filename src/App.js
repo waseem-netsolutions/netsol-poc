@@ -8,12 +8,13 @@ import LoginPage from './pages/LoginPage';
 import OtherLoginPage from "./pages/OtherLoginPage";
 import ProtectedPage from './pages/ProtectedPage';
 import ChatPage from "./pages/ChatPage.js";
-import DirectCallsPage from './pages/DirectCallsPage';
+import ChatV2Page from './pages/ChatV2Page';
 import { useAuth } from './contexts/AuthContext';
 //import './styles/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { APP_ID, USER_ID } from "./constants/sendbird";
+import { SendBirdProvider } from '@sendbird/uikit-react';
 
 export default function App() {
   //const { currentUser } = useAuth();
@@ -38,9 +39,11 @@ export default function App() {
             </ProtectedPage>
           }
         />
-        <Route exact path="/direct-calls" element={
+        <Route exact path="/chat-v2" element={
             <ProtectedPage>
-                <DirectCallsPage currentUser={currentUser}/>
+              <SendBirdProvider appId={APP_ID} userId={email} nickname={name} profileUrl={imageUrl}>
+                <ChatV2Page currentUser={currentUser}/>
+              </SendBirdProvider>
             </ProtectedPage>
           }
         />

@@ -2,7 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import axios from "axios"
 import { getAuth } from 'firebase/auth';
-import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, orderBy, limit, startAt } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, orderBy } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -92,7 +92,6 @@ export const getUser = async (email) => {
 
 export const getSimilarUsers = async (currentUser) => {
   const { isOwner, accountOwner, office } = currentUser;
-  console.log({isOwner, accountOwner, office});
   let q;
   if (isOwner) {
     q = query(collection(db, "employees"), where("isOwner", "==", true));

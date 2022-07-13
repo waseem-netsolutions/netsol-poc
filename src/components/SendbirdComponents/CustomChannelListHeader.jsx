@@ -26,7 +26,6 @@ const CustomHeader = (props) => {
     //console.log(values)
     const { groupImage, groupName } = values;
     if(sdk){
-
       const { isOwner = false, accountOwner = '', email } = currentUser;
       const groupChannelParams = new sdk.GroupChannelParams();
       groupChannelParams.addUserIds(selectedUsers);
@@ -50,56 +49,56 @@ const CustomHeader = (props) => {
     setUsersModal(true);
   }
   return (
-    <div className='custom-header-container'>
-      <section className='image-container'>
-        <div className='image'>
-          <img src={imageUrl} alt="profile-pic" />
-        </div>
-      </section>
-      <section className='info'>
-          <p className='name'>{name}</p>
-          <p className='office'>{office}</p>
-      </section>
-      <section className='action-container'>
-        <div className='action' onClick={handleCreateChannelClick}>
-            <div>
-            <PlusCircle/>
-            </div>
-        </div>
-      </section>
-      <Modal
-        show={usersModal}
-        onHide={() => setUsersModal(false)}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            Select Users
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-            <AddUsers 
-              onSubmit={handleStepOne}
-              similarUsers={similarUsers}
-            />
-        </Modal.Body>
-      </Modal>
+      <div className='custom-header-container'>
+        <section className='image-container'>
+          <div className='image'>
+            <img src={imageUrl} alt="profile-pic" />
+          </div>
+        </section>
+        <section className='info'>
+            <p className='name'>{name}</p>
+            <p className='office'>{office}</p>
+        </section>
+        <section className='action-container'>
+          <div className='action' onClick={handleCreateChannelClick}>
+              <div>
+              <PlusCircle/>
+              </div>
+          </div>
+        </section>
+        <Modal
+          show={usersModal}
+          onHide={() => setUsersModal(false)}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              Select Users
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+              <AddUsers 
+                onSubmit={handleStepOne}
+                similarUsers={similarUsers}
+              />
+          </Modal.Body>
+        </Modal>
 
-      <Modal
-        show={groupInfoModal}
-        onHide={() => setGroupInfoModal(false)}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            Add other info
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-            <AddGroupInfo
-              onSubmit={handleStepTwo}
-            />
-        </Modal.Body>
-      </Modal>
-    </div>
+        <Modal
+          show={groupInfoModal}
+          onHide={() => setGroupInfoModal(false)}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              Add other info
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+              <AddGroupInfo
+                onSubmit={handleStepTwo}
+              />
+          </Modal.Body>
+        </Modal>
+      </div>
   )
 }
 

@@ -1,0 +1,74 @@
+.main-chat-area {
+  display: flex;
+  height: calc(100vh - 56px);
+}
+
+.conversation-container {
+  flex-grow: 1;
+}
+
+.sendbird-conversation__messages {
+  overflow: hidden !important;
+}
+
+.channel-search-container {
+  width: 20%;
+  height: calc(100vh - 198px);
+}
+
+.channel-search-header-container {
+  height: 64px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  align-items: center;
+}
+
+.channel-search-header-container .heading {
+  font-size: 18px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: -0.2px;
+}
+.channel-search-header-container .close-icon{
+  cursor: pointer;
+  font-size: larger;
+}
+
+.channel-search-input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 78px;
+  padding: 16px
+}
+
+.channel-search-input {
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: 4px;
+  width: 100%;
+  height: 44px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px 16px;
+}
+
+.channel-search-input .channel-search-icon {
+  width: 24px;
+  color: gray
+}
+.message-input-container {
+  margin-left: 10px;
+}
+.message-input-container input[type=text]  {
+  border: 0px
+}
+
+.message-input-container input[type=text]:focus {
+  outline: 0;
+}
+/*# sourceMappingURL=chat-v2.css.map */

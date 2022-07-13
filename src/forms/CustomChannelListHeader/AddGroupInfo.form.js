@@ -46,7 +46,7 @@ const AddGroupInfo = (props) => {
           className='group-name-input'
         />
       </Form.Group>
-      <div>
+      <div className='group-info-btn-section'>
         <button type="submit">Submit</button>
       </div>
     </Form>

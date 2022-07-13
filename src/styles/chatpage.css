@@ -35,8 +35,8 @@
 }
 
 .groups-div{
-  position:absolute;
   bottom: 0px;
+  box-shadow: 0px -6px 7px -1px rgba(0, 0, 0, 0.2)
 }
 
 .channel-item{

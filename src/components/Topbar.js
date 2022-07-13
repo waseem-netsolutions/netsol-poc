@@ -2,7 +2,7 @@ import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { Button, Container, Nav, Navbar } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext'
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 const Topbar = () => {
 
   const [time, setTime] = useState();
@@ -34,6 +34,7 @@ const Topbar = () => {
           <Nav className="me-auto">
             <Nav.Link href="/">Home</Nav.Link>   
             <Nav.Link href="/chat">Chat</Nav.Link>
+            <Nav.Link href="/chat-v2">ChatV2</Nav.Link>
           </Nav>
           <Nav>
           <Navbar.Text>{time}</Navbar.Text>

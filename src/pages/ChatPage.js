@@ -67,7 +67,7 @@ const ChatPage = (props) => {
     if(currentUser){
       fetchSimilarUser();
     }
-  }, [currentUser])
+  }, [currentUser]);
 
   useEffect(() => {
     if (!sdk || !sdk.GroupChannel) {

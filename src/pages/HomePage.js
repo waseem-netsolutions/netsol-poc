@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import moment from 'moment';
-import { AddEmployeeForm, AllEmployees } from '../components';
+import { AddEmployeeForm, AllEmployees, Topbar } from '../components';
 import { addEmployee, getOwners } from '../util/firebase';
 import { Navbar, Container, Nav, Button, Modal } from "react-bootstrap";
 import "../styles/homepage.css"
@@ -69,29 +69,7 @@ export default function HomePage(props) {
 
   return (
     <div>
-      <Navbar bg="primary" variant="dark">
-        <Container>
-          <Navbar.Brand href="/">Logo</Navbar.Brand>
-          <Nav className="me-auto">
-            <Nav.Link href="/">Home</Nav.Link>  
-            <Nav.Link href="/chat">Chat</Nav.Link>  
-          </Nav>
-          <Nav>
-          <Navbar.Text>{time}</Navbar.Text>
-          &nbsp; &nbsp; &nbsp;
-          {currentUser? 
-            <Button onClick={handleLogout}>Signout</Button> :
-            (
-                <>
-                  <Nav.Link href="/login">Login-admin</Nav.Link>
-                  <Nav.Link href="/login-other">Login-other</Nav.Link>
-                  <Nav.Link href="/signup">Signup</Nav.Link>
-                </>
-            )  
-          }
-          </Nav>
-        </Container>
-      </Navbar>
+      <Topbar/>
       <div className={`custom-banner ${currentUser? null : "banner-fullscreen"}`}>
         <h1>{`${currentUser? `Welcome, ${currentUser.email}` : 'Please, login'}`}</h1>
       </div>

@@ -42,9 +42,12 @@
   width: 25%;
 }
 
+.sendbird-channel-header {
+  padding: 8px 8px !important;
+}
 .custom-header-container .action-container .action {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   height: 100%;
   cursor: pointer;
@@ -125,6 +128,7 @@
 }
 
 /* Add group info form */
+
 .group-name-label {
   color: #577e85;
 }
@@ -178,4 +182,19 @@
 }
 .upload-image-input {
   display: none;
+}
+
+.group-info-btn-section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 15px;
+}
+.group-info-btn-section button {
+  display: inline;
+  border: 0px;
+  background-color: #a8cf3d;
+  padding: 4px 20px;
+  border-radius: 20px;
+  color: white;
 }
