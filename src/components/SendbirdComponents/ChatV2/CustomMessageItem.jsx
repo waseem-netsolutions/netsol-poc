@@ -8,6 +8,7 @@ import OutsideClickHandler from 'react-outside-click-handler';
 import '../../../styles/custom-message.css';
 import useMounted from '../../../hooks/useMounted';
 import { useChannel } from '@sendbird/uikit-react/Channel/context';
+import { DoubleTick, SingleTick } from '../../../icons';
 
 const CustomMessageItem = (props) => {
   const {
@@ -52,8 +53,7 @@ const CustomMessageItem = (props) => {
     console.log('Thumbnail URL', thumbnailUrl)
   }
 
-  //console.log(channel.getUnreadMemberCount(message), channel.getUndeliveredMemberCount(message))
-  // console.log(message)
+  //console.log(message)
 
   let additionalData = {}
   if (data) {
@@ -84,7 +84,8 @@ const CustomMessageItem = (props) => {
   }
 
   const handleMouseLeave = () => {
-    setShowVerticalDots(false);
+    !showMessageOptions && setShowVerticalDots(false);
+    setPlayVideo(false)
   }
 
   const handleThreeDotsClick = (e) => {
@@ -137,7 +138,15 @@ const CustomMessageItem = (props) => {
   const isOwnMessage = userId === currentUser.email;
   const isTextMessage = messageType === "user";
   const isEdited = updatedAt > 0;
-  const sending = sendingStatus == "pending"
+  const sending = sendingStatus === "pending";
+  const sent = sendingStatus === "succeeded";
+  let unreadMemberCount;
+  if(isOwnMessage) {
+    unreadMemberCount = currentChannel.getUnreadMemberCount(message);
+  }
+  
+  //isOwnMessage && console.log(currentChannel.getUnreadMemberCount(message), currentChannel.getUndeliveredMemberCount(message))
+  //isOwnMessage && console.log(message);
 
   let content = null;
   let editContent = null;
@@ -201,8 +210,11 @@ const CustomMessageItem = (props) => {
     <div onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave} id={messageId}
       className={`${isOwnMessage ? 'own-message-container' : 'other-message-container'}`}
     >
-      {sending && <div>
-        <Spinner animation="border" variant="primary" />
+      {sending && <div className='loader-container'>
+        <Spinner animation="border" className='loader-spinner'/>
+      </div>}
+      {isOwnMessage && sent && !showVerticalDots && <div className='loader-container'>
+        {unreadMemberCount === 0? <DoubleTick width="20px"/> : <SingleTick width="20px"/>}
       </div>}
       {(!sending && isOwnMessage) &&
         <OutsideClickHandler onOutsideClick={() => setShowMessageOptions(false)}>

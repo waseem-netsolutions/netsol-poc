@@ -2,7 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import axios from "axios"
 import { getAuth } from 'firebase/auth';
-import { getMessaging } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, orderBy } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -24,7 +24,24 @@ const app = initializeApp(firebaseConfig);
 
 //* GET FIREBASE MESSAGING INSTANCE
 const messaging = getMessaging(app);
+export const subscribeToPushNotifications = async () => {
 
+  try {
+    const currentToken = await getToken(messaging, {
+      vapidKey: "BIXY-VncPL0hU3DU-1Fp_2-TEUR6qL94qCMF3zek4DPERLP1L0K2K_1FfNWhlEaBuxVJlUKTL_JIL0ptIThmI5g"
+    });
+    if(currentToken){
+      console.log({currentToken});
+    } else {
+      console.log('No registration token available. Request permission to generate one.');
+    }
+  } catch (error) {
+    console.log('An error occurred while retrieving token. ', error);
+  }
+}
+export const setOnMessageListener = (callback) => {
+  onMessage(messaging, callback)
+}
 
 export const db = getFirestore(app);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import moment from 'moment';
 import { AddEmployeeForm, AllEmployees, Topbar } from '../components';
@@ -8,27 +8,12 @@ import "../styles/homepage.css"
 export default function HomePage(props) {
 
   const {  logout } = useAuth();
-  const currentUser = JSON.parse(localStorage.getItem("user"));
-  const [intervalId, setIntervalId] = useState();
+  const currentUser = useMemo(() => JSON.parse(localStorage.getItem("user")), []); 
   const [refresh, setRefresh] = useState(0);
-  const [time, setTime] = useState();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [owners, setOwners] = useState([]);
   const [fetchOwnersError, setFetchOwnersError] = useState(null);
-  const handleLogout = async () => {
-    await logout();
-  };
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setTime(moment().format('D ddd, MMMM, Y, hh:mm:ss A'));
-    }, 1000);
-    setIntervalId(id);
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
-
+  
   useEffect(() => {
     const getOwnersData = async () => {
      

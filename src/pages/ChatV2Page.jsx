@@ -4,10 +4,10 @@ import { Topbar } from '../components'
 import '@sendbird/uikit-react/dist/index.css';
 import { Channel, useSendbirdStateContext, sendBirdSelectors } from "@sendbird/uikit-react";
 
-import { useChannelList, ChannelListProvider } from '@sendbird/uikit-react/ChannelList/context';
+import { useChannelListContext, ChannelListProvider } from '@sendbird/uikit-react/ChannelList/context';
 import ChannelListUI from '@sendbird/uikit-react/ChannelList/components/ChannelListUI';
 
-import { useChannel, ChannelProvider } from '@sendbird/uikit-react/Channel/context';
+import { useChannelContext, ChannelProvider } from '@sendbird/uikit-react/Channel/context';
 import ChannelUI from '@sendbird/uikit-react/Channel/components/ChannelUI';
 
 import "../styles/chat-v2.css";

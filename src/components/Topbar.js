@@ -3,22 +3,23 @@ import React, { useEffect, useState } from 'react'
 import { Button, Container, Nav, Navbar } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useNavigate } from "react-router-dom"
+import useMounted from '../hooks/useMounted';
 const Topbar = () => {
 
   const [time, setTime] = useState();
   const [intervalId, setIntervalId] = useState();
   const navigate = useNavigate();
+  const isMounted = useMounted();
 
   useEffect(() => {
     const id = setInterval(() => {
-      setTime(moment().format('D ddd, MMMM, Y, hh:mm:ss A'));
+      isMounted && setTime(moment().format('D ddd, MMMM, Y, hh:mm:ss A'));
     }, 1000);
     setIntervalId(id);
     return () => {
       clearInterval(intervalId);
     };
   }, []);
-
 
   const { logout } = useAuth();
   const handleLogout = async () => {

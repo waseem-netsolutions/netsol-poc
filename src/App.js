@@ -15,6 +15,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { APP_ID, USER_ID } from "./constants/sendbird";
 import { SendBirdProvider } from '@sendbird/uikit-react';
+import { setOnMessageListener, subscribeToPushNotifications } from './util/firebase';
 
 export default function App() {
   //const { currentUser } = useAuth();
@@ -23,6 +24,14 @@ export default function App() {
     const user = JSON.parse(localStorage.getItem("user"));
     setCurrentUser(user)
   }, [])
+
+  useEffect(() => {
+    subscribeToPushNotifications();
+    setOnMessageListener(payload => {
+      console.log('Message received. ', payload);
+    })
+  }, [])
+
   const { email = "", name = "", imageUrl = null } = currentUser || {}
   return (
     <Router>
