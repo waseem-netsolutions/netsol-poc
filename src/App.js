@@ -18,21 +18,21 @@ import { SendBirdProvider } from '@sendbird/uikit-react';
 import { setOnMessageListener, subscribeToPushNotifications } from './util/firebase';
 
 export default function App() {
-  //const { currentUser } = useAuth();
+  const { currentUser: contextUser } = useAuth();
   const [currentUser, setCurrentUser] = useState(null)
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     setCurrentUser(user)
-  }, [])
+  }, [contextUser])
+  //console.log(currentUser, contextUser)
+  // useEffect(() => {
+  //   subscribeToPushNotifications();
+  //   setOnMessageListener(payload => {
+  //     console.log('Message received. ', payload);
+  //   })
+  // }, [])
 
-  useEffect(() => {
-    subscribeToPushNotifications();
-    setOnMessageListener(payload => {
-      console.log('Message received. ', payload);
-    })
-  }, [])
-
-  const { email = "", name = "", imageUrl = null } = currentUser || {}
+  const { email = "", name = "", imageUrl = "" } = currentUser || {}
   return (
     <Router>
       <Routes>

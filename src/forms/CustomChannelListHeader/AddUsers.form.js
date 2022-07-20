@@ -28,7 +28,7 @@ export default function AddUsers(props) {
                               name={fields.name}
                               component="input"
                               type="checkbox"
-                              value={email}
+                              value={user}
                             />
                           </section>
                           <label htmlFor={email}>

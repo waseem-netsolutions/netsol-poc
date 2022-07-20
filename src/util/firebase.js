@@ -9,6 +9,7 @@ import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+import { APP_ID, API_TOKEN } from "../constants/sendbird";
 const firebaseConfig = {
   apiKey: 'AIzaSyBzQeLEWzpIoz-7P8rXWTGBetC44K6KOkA',
   authDomain: 'test-947db.firebaseapp.com',
@@ -56,14 +57,39 @@ export const addEmployee = async (data) => {
     try {
       const res = await axios.get("https://randomuser.me/api/?inc=picture");
       const apiData = res.data;
-      const imageUrl = apiData?.results?.[0]?.picture?.medium;
+      const imageUrl = apiData?.results?.[0]?.picture?.medium || '';
       data.imageUrl = imageUrl;
     } catch (error) {
       console.log("error while getting random image")
     }
     const docRef = await addDoc(collection(db, "employees"), data);
+    const metadata = {
+      dob: data.dob,
+      salary: data.salary,
+      isOwner: data.isOwner
+    }
+    if(!data.isOwner){
+      metadata.accountOwner = data.accountOwner,
+      metadata.office = data.office
+    }
+    const postData = {
+      user_id: data.email,
+      nickname: data.name,
+      profile_url: data.imageUrl,
+      metadata
+    }
+    try {
+      const res = await axios.post(`https://api-${APP_ID}.sendbird.com/v3/users`, postData, {
+        headers: {
+          'Api-Token': API_TOKEN
+        }
+      });
+      console.log("sendbird user created", res)
+    } catch (e) {
+      console.error("Error adding emp to sendbird: ", e.message);
+    }
   } catch (e) {
-    console.error("Error adding document: ", e.message);
+    console.error("Error adding emp to firebase: ", e.message);
   }
 }
 
@@ -113,17 +139,31 @@ export const getUser = async (email) => {
   }
 }
 
-export const getSimilarUsers = async (currentUser) => {
-  const { isOwner, accountOwner, office } = currentUser;
+export const getSimilarUsers = async (currentUser, showInternal) => {
+  const { isOwner, accountOwner, office, email } = currentUser;
   let q;
   if (isOwner) {
-    q = query(collection(db, "employees"), where("isOwner", "==", true));
+    if(showInternal){
+      q = query(collection(db, "employees"),  
+            where("accountOwner", "==", email), 
+          );
+    } else {
+      q = query(collection(db, "employees"), where("isOwner", "==", true));
+    }
   } else {
-    q = query(collection(db, "employees"), 
-          where("isOwner", "==", false), 
-          where("accountOwner", "==", accountOwner), 
-          //where("office", "==", office)
-        );
+    if(showInternal){
+      q = query(collection(db, "employees"), 
+            where("isOwner", "==", false), 
+            where("accountOwner", "==", accountOwner), 
+            //where("office", "==", office)
+          );
+    } else {
+      q = query(collection(db, "employees"), 
+            where("isOwner", "==", false), 
+            where("accountOwner", "==", accountOwner), 
+            where("office", "!=", office)
+          );
+    }
   }
   try {
     const querySnapshot = await getDocs(q);

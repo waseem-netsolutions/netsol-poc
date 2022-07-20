@@ -7,15 +7,37 @@ import AddUsers from '../../../forms/CustomChannelListHeader/AddUsers.form';
 import '../../../styles/custom-header.css';
 
 const CustomHeader = (props) => {
-  const { currentUser, similarUsers, sdk, setCurrentChannel} = props;
+  const { currentUser, similarUsers, sdk, setCurrentChannel, showInternal} = props;
   const { name, office = '', imageUrl } = currentUser || {};
   const [usersModal, setUsersModal] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [groupInfoModal, setGroupInfoModal] = useState(false);
 
-  const handleStepOne = (values) => {
+  const handleStepOne = async (values) => {
     const { selectedUsers: selectedUsersFromForm = [] } = values;
     if(!selectedUsersFromForm.length) return
+    if(selectedUsersFromForm?.length === 1){
+      if(sdk){
+        const selectedUser = selectedUsersFromForm?.[0];
+        const { email: selectedUserEmail, imageUrl, name } = selectedUser;
+        const { isOwner = false, accountOwner = '', email } = currentUser;
+        const groupChannelParams = {};
+        groupChannelParams.coverUrl = imageUrl;
+        groupChannelParams.invitedUserIds = [selectedUserEmail]
+        groupChannelParams.name = name;
+        groupChannelParams.operatorUserIds = [email]
+        groupChannelParams.customType = showInternal ? "internal" : "external";
+        if (!isOwner) groupChannelParams.data = JSON.stringify({ accountOwner, office, internal: showInternal });
+        try {
+          const channel = await sdk.groupChannel.createChannel(groupChannelParams);
+          setCurrentChannel(channel);
+          setUsersModal(false);
+        } catch (error) {
+          console.log(error)
+        }
+      }
+      return
+    }
     setSelectedUsers(selectedUsersFromForm)
     setUsersModal(false);
     setGroupInfoModal(true);
@@ -25,17 +47,16 @@ const CustomHeader = (props) => {
     const { groupImage, groupName } = values;
     if(sdk){
       const { isOwner = false, accountOwner = '', email } = currentUser;
-      const groupChannelParams = new sdk.GroupChannelParams();
-      groupChannelParams.addUserIds(selectedUsers);
+      const groupChannelParams = {};
       groupChannelParams.coverImage = groupImage;
-      console.log(groupImage)
+      groupChannelParams.invitedUserIds = selectedUsers.map(user => user.email);
       groupChannelParams.name = groupName;
       groupChannelParams.operatorUserIds = [email]
       groupChannelParams.customType = isOwner? "internal" : "external";
       if(!isOwner) groupChannelParams.data = JSON.stringify({ accountOwner, office });
 
       try {
-        const channel = await sdk.GroupChannel.createChannel(groupChannelParams);
+        const channel = await sdk.groupChannel.createChannel(groupChannelParams);
         setCurrentChannel(channel);
         setGroupInfoModal(false);
       } catch (error) {

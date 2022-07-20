@@ -7,9 +7,10 @@ import { useChannelList } from '@sendbird/uikit-react/ChannelList/context';
 import '../../../styles/custom-channel-preview.css';
 
 const CustomChannelPreview = (props) => {
-    const {channel: currentChannel, onLeaveChannel, currentChannelUrl, setCurrentChannel} = props;
+    const {channel: currentChannel, onLeaveChannel, currentChannelUrl, setCurrentChannel, from = ''} = props;
     const [showActionDots, setShowActionDots] = useState(false);
     const [showActionOptions, setShowActionOptions] = useState(false);
+    const isOperator = currentChannel.myRole === "operator";
     //console.log(props.channel.name, props.channel.customType, props.channel.data)
     //console.log(useChannelList())
     const isActive = currentChannelUrl === currentChannel.url;
@@ -40,7 +41,7 @@ const CustomChannelPreview = (props) => {
 
     const handleLeaveChannel = async () => {
       try {
-        await onLeaveChannel(currentChannel);
+        await onLeaveChannel(from === 'custom-list' ? currentChannel.url : currentChannel);
       } catch (error) {
         handleError(error);
       }
@@ -72,6 +73,15 @@ const CustomChannelPreview = (props) => {
         handleError(error)
       }
     }
+    const handleDeleteChannel = async () => {
+      try {
+        await currentChannel.delete();
+        setCurrentChannel(null);
+        console.log(`${currentChannel.name} - deleted`);
+      } catch (error) {
+        console.log("***err while deleting the channel", error)
+      }
+    }
     const handleError = (err) => {
       console.log("***errror", err);
     }
@@ -87,6 +97,11 @@ const CustomChannelPreview = (props) => {
       {
         label: "Clear history",
         onClick: handleClearHistory
+      },
+      {
+        label: "Delete channel",
+        onClick: handleDeleteChannel,
+        visible: isOperator
       }
     ]
     return (
@@ -94,6 +109,7 @@ const CustomChannelPreview = (props) => {
         className={`channel-preview-container ${activeClass()}`} 
         onMouseOver={() => setShowActionDots(true)} 
         onMouseLeave={() => {!showActionOptions && setShowActionDots(false)}}
+        onClick={() => setCurrentChannel(currentChannel)}
       >
         <div className='channel-preview-image-container'>
           <img src={currentChannel?.coverUrl} alt="" />

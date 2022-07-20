@@ -1,0 +1,17 @@
+.message-input-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.attachment-icon {
+  height: auto;
+  width: 26px;
+  cursor: pointer;
+}
+.attachment-icon:hover{
+  fill: #a8cf3d
+}
+.message-input {
+  width: 80%;
+}

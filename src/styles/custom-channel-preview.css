@@ -111,6 +111,7 @@
 .action-icon:hover {
   background-color: rgba(183, 186, 177, 0.2);
   border-radius: 3px;
+  cursor: pointer;
 }
 
 .action-container-show, .action-dots-show {
@@ -132,6 +133,7 @@
   right: 30px;
   top: 30px;
   display: block;
+  z-index: 5;
 }
 
 .action-options ul {

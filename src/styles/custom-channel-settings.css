@@ -1,0 +1,69 @@
+.accordion-body {
+  padding: 0.5rem 0rem;
+}
+.settings-users-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.settings-user-item {
+  display: flex;
+  padding: 7px 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* .settings-user-item:hover{
+  background-color: #dee2e6;
+} */
+
+.settings-user-item-info {
+  display: flex;
+}
+
+.settings-user-item-pic-container {
+  height: 24px;
+  width: 24px;
+  overflow: hidden;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.settings-user-item-pic-container > img {
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.settings-user-item-name {
+  margin: 0;
+  padding-left: 10px;
+  font-size: medium;
+}
+
+.operator-test {
+  font-size: small;
+  color: grey;
+}
+
+.accordian-btn-section {
+  padding-top: 16px;
+  padding-left: 10px;
+}
+.custom-button {
+  display: inline;
+  border: 0px;
+
+  padding: 4px 20px;
+  border-radius: 5px;
+  color: black;
+  background-color: white;
+  border: 1px solid #a8cf3d;
+}
+
+.custom-button:hover {
+  background-color: #a8cf3d;
+  color: white;
+}

@@ -7,7 +7,7 @@ import { Download, PlayBtn, ThreeDotsVertical } from 'react-bootstrap-icons';
 import OutsideClickHandler from 'react-outside-click-handler';
 import '../../../styles/custom-message.css';
 import useMounted from '../../../hooks/useMounted';
-import { useChannel } from '@sendbird/uikit-react/Channel/context';
+import { useChannelContext } from '@sendbird/uikit-react/Channel/context';
 import { DoubleTick, SingleTick } from '../../../icons';
 
 const CustomMessageItem = (props) => {
@@ -23,7 +23,7 @@ const CustomMessageItem = (props) => {
     sdk
   } = props;
   //TODO console.log(channel.getUnreadMemberCount(message), channel.getUndeliveredMemberCount(message))
-  const { highLightedMessageId } = useChannel();
+  const { highLightedMessageId } = useChannelContext();
   const [selectedMessage, setSelectedMessage] = useState(false);
   const [showVerticalDots, setShowVerticalDots] = useState(false);
   const [showMessageOptions, setShowMessageOptions] = useState(false);
@@ -31,7 +31,6 @@ const CustomMessageItem = (props) => {
   const [updatedMessage, setUpdatedMessage] = useState("");
   const [playVideo, setPlayVideo] = useState(false);
   const isMounted = useMounted();
-
   const {
     createdAt,
     updatedAt,
@@ -42,7 +41,7 @@ const CustomMessageItem = (props) => {
     name,
     type,
     url,
-    _sender,
+    sender,
     data,
     sendingStatus,
     thumbnails
@@ -50,7 +49,7 @@ const CustomMessageItem = (props) => {
   let thumbnailUrl;
   if (thumbnails && thumbnails.length) {
     thumbnailUrl = thumbnails[0].url;
-    console.log('Thumbnail URL', thumbnailUrl)
+    //console.log('Thumbnail URL', thumbnailUrl)
   }
 
   //console.log(message)
@@ -95,7 +94,7 @@ const CustomMessageItem = (props) => {
   const handleDeleteMessage = async () => {
     setShowMessageOptions(false);
     try {
-      await deleteMessage(currentChannel.url, message);
+      await deleteMessage(currentChannel, message);
       console.log("Message Deleted");
     } catch (error) {
       console.log("Error while deleteing a message", error);
@@ -119,9 +118,9 @@ const CustomMessageItem = (props) => {
 
   const handleEditMessageSave = async () => {
     try {
-      const userMessageParams = new sdk.UserMessageParams();
+      const userMessageParams = {};
       userMessageParams.message = updatedMessage;
-      await updateUserMessage(currentChannel.url, messageId, userMessageParams);
+      await updateUserMessage(currentChannel, messageId, userMessageParams);
       console.log("Message updated");
     } catch (error) {
       console.log("Error while updating a message", error)
@@ -134,7 +133,7 @@ const CustomMessageItem = (props) => {
   }
 
 
-  const { userId } = _sender;
+  const { userId } = sender;
   const isOwnMessage = userId === currentUser.email;
   const isTextMessage = messageType === "user";
   const isEdited = updatedAt > 0;
@@ -237,7 +236,7 @@ const CustomMessageItem = (props) => {
       <div
         className={`text-message-area ${isOwnMessage ? 'text-message-area-outgoing' : 'text-message-area-incoming'} ${selectedMessage ? 'highlighted-message' : ''}`}>
         <div className='user-name-container'>
-          <span className='name'>{isOwnMessage ? "You" : _sender.nickname}</span>
+          <span className='name'>{isOwnMessage ? "You" : sender.nickname}</span>
           <span className='office'>{additionalData.office ? additionalData.office : null}</span>
         </div>
         {showEditInput ? editContent : content}

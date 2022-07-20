@@ -7,6 +7,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
+import useMounted from '../hooks/useMounted';
 
 const AuthContext = React.createContext();
 
@@ -16,6 +17,7 @@ export function useAuth() {
 
 export default function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState();
+  const isMounted = useMounted();
   function signup(email, password) {
     return createUserWithEmailAndPassword(auth, email, password);
   }
@@ -37,7 +39,7 @@ export default function AuthProvider({ children }) {
   function logout() {
     localStorage.setItem('user', null);
     localStorage.setItem("userType", null);
-    setCurrentUser(null)
+    isMounted && setCurrentUser(null)
     return signOut(auth);
   }
 

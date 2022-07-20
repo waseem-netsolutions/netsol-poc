@@ -6,7 +6,8 @@ const GroupsComponent = (props) => {
   return (
     <div className='groups-div'>
       {groups.reduce((acc, group) => group.label === "ungrouped" ? [group, ...acc] : [...acc, group], []).map(group => {
-        const { label, handleGroupClick, isSelected } = group;
+        const { label, handleGroupClick, isSelected, visible = true } = group;
+        if(!visible) return null
         return (
           <div key={label} onClick={handleGroupClick} className={`group-item ${isSelected ? 'group-item-selected' : ''}`}>
             <span>{label}</span>

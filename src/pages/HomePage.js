@@ -7,8 +7,8 @@ import { Navbar, Container, Nav, Button, Modal } from "react-bootstrap";
 import "../styles/homepage.css"
 export default function HomePage(props) {
 
-  const {  logout } = useAuth();
-  const currentUser = useMemo(() => JSON.parse(localStorage.getItem("user")), []); 
+  const { currentUser: contextUser } = useAuth();
+  const currentUser = useMemo(() => JSON.parse(localStorage.getItem("user")), [contextUser]); 
   const [refresh, setRefresh] = useState(0);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [owners, setOwners] = useState([]);

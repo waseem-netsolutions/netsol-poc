@@ -21,7 +21,7 @@ const CustomMessageItem = (props) => {
     setHighlighedMessage,
   } = props;
   //TODO console.log(channel.getUnreadMemberCount(message), channel.getUndeliveredMemberCount(message))
-  //console.log(message)
+  console.log(message)
   const [selectedMessage, setSelectedMessage] = useState(false);
   const [showVerticalDots, setShowVerticalDots] = useState(false);
   const [showMessageOptions, setShowMessageOptions] = useState(false);

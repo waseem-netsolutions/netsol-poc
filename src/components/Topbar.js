@@ -4,10 +4,10 @@ import { Button, Container, Nav, Navbar } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useNavigate } from "react-router-dom"
 import useMounted from '../hooks/useMounted';
+let intervalId;
 const Topbar = () => {
 
   const [time, setTime] = useState();
-  const [intervalId, setIntervalId] = useState();
   const navigate = useNavigate();
   const isMounted = useMounted();
 
@@ -15,16 +15,17 @@ const Topbar = () => {
     const id = setInterval(() => {
       isMounted && setTime(moment().format('D ddd, MMMM, Y, hh:mm:ss A'));
     }, 1000);
-    setIntervalId(id);
+    intervalId = id;
     return () => {
       clearInterval(intervalId);
     };
   }, []);
 
   const { logout } = useAuth();
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
+  const handleLogout = () => {
+     logout().then(() => {
+        window.location.href = "/";
+     });
   };
   
   const currentUser = JSON.parse(localStorage.getItem("user"))

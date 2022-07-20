@@ -1,3 +1,4 @@
+import produce from 'immer';
 import React, { useRef, useState } from 'react'
 import { Form } from 'react-bootstrap';
 import { Upload } from 'react-bootstrap-icons';
@@ -5,16 +6,28 @@ import { Upload } from 'react-bootstrap-icons';
 const AddGroupInfo = (props) => {
   const { onSubmit } = props
   const [groupImage, setGroupImage] = useState(null);
+  const [groupName, setGroupName] = useState('');
+  const [errors, setErrors] = useState({});
   const [imageUrl, setImageUrl] = useState('');
   const groupNameRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const groupName = groupNameRef?.current.value;
-    if (!groupImage || !groupName) return;
+    if (!groupName){
+      setErrors(produce(errors => {
+        errors.groupName = "Please provide a group name"
+      }))
+      return
+    };
     onSubmit({ groupImage, groupName })
   }
-
+  const handleGroupNameChange = (e) => {
+    setErrors(produce(errors => {
+      errors.groupName = ""
+    }))
+    const value = e.target.value;
+    setGroupName(value)
+  }
   const handleInputChange = (e) => {
     const file = e.target.files?.[0];
     setGroupImage(file);
@@ -39,12 +52,16 @@ const AddGroupInfo = (props) => {
       <Form.Group className='mb-3'>
         <Form.Label htmlFor="groupName" className='group-name-label'>Group Name</Form.Label>
         <Form.Control
-          ref={groupNameRef}
           type="text"
           id="groupName"
           name="groupName"
           className='group-name-input'
+          isInvalid={errors.groupName}
+          maxLength={100}
+          value={groupName}
+          onChange={handleGroupNameChange}
         />
+        {!!errors.groupName && <span style={{color: "red"}}>{errors.groupName}</span>}
       </Form.Group>
       <div className='group-info-btn-section'>
         <button type="submit">Submit</button>
