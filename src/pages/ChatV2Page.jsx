@@ -28,6 +28,7 @@ import { Y as GroupChannelHandler } from "../../node_modules/@sendbird/uikit-rea
 import { v4 as uuidv4 } from 'uuid';
 import { useEffect } from 'react';
 import { useRef } from 'react';
+import ViewMediaModal from '../modals/ViewMediaModal';
 
 const ChatV2Page = (props) => {
   const { currentUser } = props;
@@ -75,6 +76,7 @@ const ChatV2Page = (props) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showInternal, setShowInternal] = useState(true);
+  const [showMediaModal, setShowMediaModal] = useState(false);
 
   //* Query Object for ChannelList
   const [channelListQuery, setChannelListQuery] = useState({
@@ -268,6 +270,7 @@ const ChatV2Page = (props) => {
                 <CustomConversationHeader
                   onSearchClick={handleSearchIconClick}
                   onSettingsClick={handleSettingIconClick}
+                  onMediaClick={() => setShowMediaModal(true)}
                   onCallClick={f => f}
                   channel={currentChannel}
                 />
@@ -329,7 +332,14 @@ const ChatV2Page = (props) => {
           </div>
         }
       </div>
-      
+      {
+        showMediaModal && 
+          <ViewMediaModal
+            showMediaModal={showMediaModal}
+            setShowMediaModal={setShowMediaModal}
+            currentChannel={currentChannel}
+          />
+      }
     </div>
   )
 }

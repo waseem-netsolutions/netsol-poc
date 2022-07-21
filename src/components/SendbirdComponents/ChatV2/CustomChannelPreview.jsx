@@ -11,6 +11,7 @@ const CustomChannelPreview = (props) => {
     const [showActionDots, setShowActionDots] = useState(false);
     const [showActionOptions, setShowActionOptions] = useState(false);
     const isOperator = currentChannel.myRole === "operator";
+    //console.log(currentChannel)
     //console.log(props.channel.name, props.channel.customType, props.channel.data)
     //console.log(useChannelList())
     const isActive = currentChannelUrl === currentChannel.url;
@@ -18,12 +19,16 @@ const CustomChannelPreview = (props) => {
     const duration = moment.duration(lastMessageTimeFromNow).get("days");
     const timeToShow = duration > 1 ? moment(currentChannel?.lastMessage?.createdAt).format("MMM D") 
                                     : moment(currentChannel?.lastMessage?.createdAt).format("h:mm A");
-    // let officeName = ''
-    // if(currentChannel && currentChannel.data){ officeName = JSON.parse(currentChannel.data).officeBranch}
-    // if(officeName != module+office){ return null }
 
+
+    let officeName = ''
+    const { memberCount, data } = currentChannel
+    if(data && memberCount === 2){ 
+      officeName = JSON.parse(data).office
+    }
+  
     const activeClass = () => {
-      return isActive ? 'active' : ''
+      return isActive ? 'active-channel' : ''
     }
     
     const showHideDots = () => {
@@ -135,6 +140,9 @@ const CustomChannelPreview = (props) => {
                 </div>
               </OutsideClickHandler>
           </div>
+          {!!officeName && <div className='office-name-container'>
+            <span>{officeName}</span>
+          </div>}
           <div className='last-message-container'>
             <div className='last-message'>
               <span>{currentChannel?.lastMessage?.message || currentChannel?.lastMessage?.name}</span>

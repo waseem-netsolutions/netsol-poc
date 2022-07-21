@@ -1,12 +1,14 @@
 import React from 'react'
-import { Info, Search, Telephone } from 'react-bootstrap-icons';
+import { Info, Search, Telephone, FileEarmark } from 'react-bootstrap-icons';
+
 
 const CustomConversationHeader = (props) => {
   const { 
     channel, 
     onSearchClick, 
     onSettingsClick, 
-    onCallClick 
+    onCallClick ,
+    onMediaClick
   } = props;
   const { name: groupName, coverUrl, memberCount } = channel;
   return (
@@ -21,6 +23,9 @@ const CustomConversationHeader = (props) => {
       </section>
       <section className='chatheader-channel-actions'>
         <div>
+          <span onClick={onMediaClick}>
+            <FileEarmark/>
+          </span>
           <span onClick={onSearchClick}>
             <Search/>
           </span>

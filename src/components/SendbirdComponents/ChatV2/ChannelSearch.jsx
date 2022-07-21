@@ -16,7 +16,6 @@ const ChannelSearch = (props) => {
   const handleSearchInputTextChange = (e) => {
     const value = e.target.value;
     setSearchInputText(value);
-    handleUpdateSearchString.cancel();
     handleUpdateSearchString(value, setSearchString, isMounted);
   }
   return (
@@ -42,8 +41,9 @@ const ChannelSearch = (props) => {
             <input type="text" value={searchInputText} onChange={handleSearchInputTextChange} placeholder='search'/>
           </div>
         </div>
-        </div>
+      </div>
       <MessageSearchUI />
+      
     </MessageSearchProvider>
   )
 }

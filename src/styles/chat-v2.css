@@ -71,4 +71,9 @@
 .message-input-container input[type=text]:focus {
   outline: 0;
 }
+
+.custom-view-media-modal .modal-dialog{
+  max-width: 800px;
+  width: 100%;
+}
 /*# sourceMappingURL=chat-v2.css.map */
