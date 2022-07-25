@@ -23,6 +23,7 @@
 .custom-header-container .info {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   width: 50%;
 }
 .custom-header-container .info p {

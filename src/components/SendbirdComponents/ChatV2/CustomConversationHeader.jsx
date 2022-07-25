@@ -1,5 +1,5 @@
 import React from 'react'
-import { Info, Search, Telephone, FileEarmark } from 'react-bootstrap-icons';
+import { Info, Search, Telephone, FileEarmark, CameraVideo } from 'react-bootstrap-icons';
 
 
 const CustomConversationHeader = (props) => {
@@ -7,10 +7,21 @@ const CustomConversationHeader = (props) => {
     channel, 
     onSearchClick, 
     onSettingsClick, 
-    onCallClick ,
-    onMediaClick
+    onVideoCallClick,
+    onAudioCallClick,
+    onMediaClick,
+    currentUser
   } = props;
-  const { name: groupName, coverUrl, memberCount } = channel;
+  const { name: groupName, coverUrl, memberCount, data } = channel;
+  let channelName = groupName;
+  let officeName = '';
+  if (data && memberCount === 2) {
+    const customMembers = JSON.parse(data)?.members || [];
+    const otherUser = customMembers?.filter(mem => mem.email !== currentUser.email)?.[0];
+    channelName = otherUser?.name;
+    officeName = otherUser?.office;
+  }
+  console.log(JSON.parse(channel.data))
   return (
     <div className='chatheader-container'>
       <section className='chatheader-image-container'>
@@ -19,7 +30,10 @@ const CustomConversationHeader = (props) => {
           </div>
       </section>
       <section className='chatheader-channel-name'>
-        {groupName}
+        <div>{channelName}</div>
+        {!!officeName && <div style={{color: 'grey', fontSize: '13px'}}>
+          {officeName}
+        </div>}
       </section>
       <section className='chatheader-channel-actions'>
         <div>
@@ -29,12 +43,15 @@ const CustomConversationHeader = (props) => {
           <span onClick={onSearchClick}>
             <Search/>
           </span>
-          {memberCount === 2 && <span onClick={() => onCallClick(ps => !ps)}>
+          {memberCount === 2 && <span onClick={onVideoCallClick}>
+            <CameraVideo/>
+          </span>}
+          {memberCount === 2 && <span onClick={onAudioCallClick}>
             <Telephone/>
           </span>}
-          <span onClick={onSettingsClick}>
+          {memberCount > 2 && <span onClick={onSettingsClick}>
             <Info />
-          </span>
+          </span>}
         </div>
       </section>
     </div>

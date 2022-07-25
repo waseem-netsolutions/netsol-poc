@@ -33,7 +33,7 @@ export default function HomePage(props) {
   
 
   const handleSubmit = (values) => {
-    const { dob, email, name, salary, isOwner = false, empId, accountOwner, office } = values;
+    const { dob, email, name, salary, isOwner = false, empId, accountOwner, office, isAdmin = false } = values;
     const data = {
       dob,
       email,
@@ -45,6 +45,7 @@ export default function HomePage(props) {
     if(!isOwner){
       data.accountOwner = accountOwner;
       data.office = office;
+      data.isAdmin = isAdmin;
     }
     addEmployee(data);
     setRefresh((prev) => prev + 1);
@@ -58,7 +59,7 @@ export default function HomePage(props) {
       <div className={`custom-banner ${currentUser? null : "banner-fullscreen"}`}>
         <h1>{`${currentUser? `Welcome, ${currentUser.email}` : 'Please, login'}`}</h1>
       </div>
-      {currentUser? <div>
+      {currentUser? <div key={refresh}>
         <AllEmployees refresh={refresh} setRefresh={setRefresh} setModalIsOpen={setModalIsOpen} />
       </div> : null}
       <Modal
@@ -74,7 +75,7 @@ export default function HomePage(props) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <AddEmployeeForm handleSubmit={handleSubmit} owners={owners}/>
+          <AddEmployeeForm handleSubmit={handleSubmit} owners={owners} currentUser={currentUser}/>
         </Modal.Body>
       </Modal>
     </div>

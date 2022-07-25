@@ -3,7 +3,7 @@ import validator from 'validator';
 import { Button, Form } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 const AddEmployeeForm = (props) => {
-  const { handleSubmit, owners } = props;
+  const { handleSubmit, owners, currentUser } = props;
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [dob, setDob] = useState('');
@@ -13,7 +13,19 @@ const AddEmployeeForm = (props) => {
   const [err, setErr] = useState({});
   const [accountOwner, setAccountOwener] = useState("");
   const [office, setOffice] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
+
+  const offices = {
+    "florian123@mailinator.com": [
+      "Urban Dental",
+      "Dental Clinic",
+      "You only Live Once"
+    ],
+    "lisa123@mailinator.com": [
+      "Clinic by Lisa"
+    ]
+  }
 
 
   const submit = (e) => {
@@ -57,11 +69,10 @@ const AddEmployeeForm = (props) => {
       dob,
       salary,
       isOwner,
-      empId
-    }
-    if(!isOwner){
-      values.accountOwner = accountOwner;
-      values.office = office
+      empId,
+      isAdmin,
+      accountOwner,
+      office
     }
     handleSubmit(values);
     setEmail("");
@@ -69,6 +80,7 @@ const AddEmployeeForm = (props) => {
     setDob("");
     setSalary("");
     setIsOwner(false);
+    setIsAdmin(false);
     setErr({})
   }
 
@@ -78,6 +90,13 @@ const AddEmployeeForm = (props) => {
   if(!name && empId){
     setEmpId(null);
   }
+
+
+  let officesList = null
+  if(offices[accountOwner]){
+    officesList = offices[accountOwner].map(o => <option key={o} value={o}>{o}</option>)
+  }
+
   return (
           <Form
             onSubmit={submit}
@@ -171,7 +190,7 @@ const AddEmployeeForm = (props) => {
                 {owners.map(item => {
                   const { name, email } = item;
                   return (
-                    <option key={email} value={email}>{name}</option>
+                    <option key={email} value={name}>{name}</option>
                   )
                 })}
               </select>
@@ -180,11 +199,20 @@ const AddEmployeeForm = (props) => {
               <label htmlFor="office">Which Office</label> &nbsp; &nbsp;
               <select name="office" id="office" defaultValue={office} onChange={(e) => setOffice(e.target.value)}>
                 <option value="" hidden>Select office</option>
-                <option value="office1"> Office 1</option>
-                <option value="office2">Office 2</option>
-              </select>
+                {officesList}
+              </select>              
               <br />
               <br />
+              <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                id="isAdmin"
+                name="isAdmin"
+                checked={isAdmin}
+                onChange={() => setIsAdmin(!isAdmin)}
+                label="Is Admin"
+              />
+            </Form.Group>
             </> : null}
            
               

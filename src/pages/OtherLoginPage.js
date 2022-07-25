@@ -4,6 +4,7 @@ import { useNavigate, Link, Navigate } from 'react-router-dom';
 import validator from "validator";
 import { Button, Card, Form } from 'react-bootstrap';
 import "../styles/loginpage.css";
+import { uniqBy } from 'lodash';
 
 const  OtherLoginPage = () => {
 
@@ -11,6 +12,9 @@ const  OtherLoginPage = () => {
   if (currentUser) return <Navigate to="/" />;
 
   const [email, setEmail] = useState('');
+  const [step, setStep] = useState(1);
+  const [owner, setOwner] = useState('');
+  const [users, setUsers] = useState([]);
   const [password, setPassword] = useState('');
   const [err, setErr] = useState({});
   const [loginErr, setLoginErr] = useState(null);
@@ -18,6 +22,20 @@ const  OtherLoginPage = () => {
   const { otherLogin } = useAuth();
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    const [data, err, setCurrentUser] = await otherLogin(email);
+    if (err)
+      return setLoginErr(err.message);
+    if (data && data.length) {
+      const u = data.find(u => (u.email === email && u.accountOwner === owner));
+      setCurrentUser(u);
+      localStorage.setItem('user', JSON.stringify(u));
+      localStorage.setItem("userType", "other-user");
+      return navigate('/chat-v2');
+    }
+  };
+
+  const handleStepOne = async (e) => {
     e.preventDefault();
     let hasError = false;
     if(!email){
@@ -34,15 +52,28 @@ const  OtherLoginPage = () => {
       hasError = true
     }
     if (hasError) return
-    const [data, err] = await otherLogin(email);
+    const [data, err, setCurrentUser] = await otherLogin(email);
     if(err)
       return setLoginErr(err.message);
-    if (data && data.length)
-      return navigate('/');
+    if (data && data.length) {
+      // if(password !== 'Admin@123456'){
+      //   setLoginErr("Wrong password");
+      //   return;
+      // }
+      const user = data[0];
+      if (user.isOwner) {
+        setCurrentUser(data[0]);
+        localStorage.setItem('user', JSON.stringify(data[0]));
+        localStorage.setItem("userType", "other-user");
+        return navigate('/chat-v2');
+      } else {
+        setUsers(data);
+        setStep(2);
+      }
+    }
     if (data && !data.length)
-      setLoginErr("No such user found");
-  };
-
+      setLoginErr("No such user with this email");
+  }
 
   return (
     <div className='main-div'>
@@ -70,6 +101,9 @@ const  OtherLoginPage = () => {
                     }
                   }}
                   onChange={(e) => {
+                    if(step === 2){
+                      setStep(1);
+                    }
                     setEmail(e.target.value);
                     setErr(prev => ({...prev, email: ""}))
                     setLoginErr(null);
@@ -103,7 +137,21 @@ const  OtherLoginPage = () => {
                 {err.password ? <p className='error-msg'>{err.password}</p> : null}
               </Form.Group> */}
               {loginErr?  <p className='error-msg'>{loginErr}</p> : null}
-              <Button varient="primary" type="submit">Login</Button>
+              {step === 1 && 
+                  <Button varient="primary" type="button" onClick={handleStepOne}>Next</Button>
+              }
+              {
+                step === 2 && <>
+                  <label htmlFor="owner">Account Owner</label> &nbsp; &nbsp;
+                  <select name="owner" id="owner" defaultValue={owner} onChange={(e) => setOwner(e.target.value)}>
+                    <option value="" hidden>Select...</option>
+                    {uniqBy(users, 'accountOwner').map(u => <option value={u.accountOwner} key={u.accountOwner}>{u.accountOwner}</option>)}
+                  </select>
+                  <br/>
+                  <br/>
+                </>
+              }
+              {step === 2 && <Button varient="primary" type="submit">Login</Button>}
               <Link className='btn-margin-left' to="/signup">Or Signup</Link>
           </Form>
         </Card.Body>

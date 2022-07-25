@@ -7,8 +7,9 @@ import { useChannelList } from '@sendbird/uikit-react/ChannelList/context';
 import '../../../styles/custom-channel-preview.css';
 
 const CustomChannelPreview = (props) => {
-    const {channel: currentChannel, onLeaveChannel, currentChannelUrl, setCurrentChannel, from = ''} = props;
+    const {channel: currentChannel, onLeaveChannel, currentChannelUrl, setCurrentChannel, from = '', currentUser} = props;
     const [showActionDots, setShowActionDots] = useState(false);
+    //console.log(currentChannel)
     const [showActionOptions, setShowActionOptions] = useState(false);
     const isOperator = currentChannel.myRole === "operator";
     //console.log(currentChannel)
@@ -21,11 +22,21 @@ const CustomChannelPreview = (props) => {
                                     : moment(currentChannel?.lastMessage?.createdAt).format("h:mm A");
 
 
+    const { memberCount, data, name } = currentChannel
     let officeName = ''
-    const { memberCount, data } = currentChannel
+    let channelOwner = ''
+    let channelName = name;
     if(data && memberCount === 2){ 
-      officeName = JSON.parse(data).office
+      const customMembers = JSON.parse(data)?.members || []; 
+      const otherUser = customMembers?.filter(mem => mem.email !== currentUser.email)?.[0];
+      officeName = otherUser?.office;
+      channelName = otherUser?.name;
     }
+    if(!currentUser.isOwner && data){
+      channelOwner = JSON.parse(data).accountOwner;
+    }
+    console.log({currentUser, channelOwner, currentChannel})
+    if(!currentUser.isOwner && currentUser.accountOwner !== channelOwner) return null
   
     const activeClass = () => {
       return isActive ? 'active-channel' : ''
@@ -46,7 +57,17 @@ const CustomChannelPreview = (props) => {
 
     const handleLeaveChannel = async () => {
       try {
+        if(currentChannel.data){
+          const previousData = JSON.parse(currentChannel.data);
+          const previousMembers = previousData?.members;
+          const updatedMembers = previousMembers.filter(m => m.email !== currentUser.email);
+          previousData.members = updatedMembers;
+          const updateChannelParams = {};
+          updateChannelParams.data = JSON.stringify(previousData);
+          await currentChannel.updateChannel(updateChannelParams);
+        }
         await onLeaveChannel(from === 'custom-list' ? currentChannel.url : currentChannel);
+        setCurrentChannel(null);
       } catch (error) {
         handleError(error);
       }
@@ -73,7 +94,7 @@ const CustomChannelPreview = (props) => {
     const handleClearHistory = async () => {
       try {
         await currentChannel.resetMyHistory();
-        setCurrentChannel(null);
+        //setCurrentChannel(null);
       } catch (error) {
         handleError(error)
       }
@@ -123,8 +144,8 @@ const CustomChannelPreview = (props) => {
         <div className='channel-preview-info-container'>
           <div className='info'>
               <div className='name-members'>
-                <span className='name'>{currentChannel?.name}</span>
-                <span className='members'>{currentChannel?.memberCount}</span>
+                <span className='name'>{channelName}</span>
+                {currentChannel?.memberCount > 2 && <span className='members'>{currentChannel?.memberCount}</span>}
               </div>
               <span className={`time ${showHideTime()}`}>{timeToShow}</span>
               <OutsideClickHandler 

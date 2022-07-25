@@ -54,40 +54,40 @@ export default app;
 //Methods to manipulate the db
 export const addEmployee = async (data) => {
   try {
-    try {
-      const res = await axios.get("https://randomuser.me/api/?inc=picture");
-      const apiData = res.data;
-      const imageUrl = apiData?.results?.[0]?.picture?.medium || '';
-      data.imageUrl = imageUrl;
-    } catch (error) {
-      console.log("error while getting random image")
-    }
+    // try {
+    //   const res = await axios.get("https://randomuser.me/api/?inc=picture");
+    //   const apiData = res.data;
+    //   const imageUrl = apiData?.results?.[0]?.picture?.medium || '';
+    //   data.imageUrl = imageUrl;
+    // } catch (error) {
+    //   console.log("error while getting random image")
+    // }
     const docRef = await addDoc(collection(db, "employees"), data);
-    const metadata = {
-      dob: data.dob,
-      salary: data.salary,
-      isOwner: data.isOwner
-    }
-    if(!data.isOwner){
-      metadata.accountOwner = data.accountOwner,
-      metadata.office = data.office
-    }
-    const postData = {
-      user_id: data.email,
-      nickname: data.name,
-      profile_url: data.imageUrl,
-      metadata
-    }
-    try {
-      const res = await axios.post(`https://api-${APP_ID}.sendbird.com/v3/users`, postData, {
-        headers: {
-          'Api-Token': API_TOKEN
-        }
-      });
-      console.log("sendbird user created", res)
-    } catch (e) {
-      console.error("Error adding emp to sendbird: ", e.message);
-    }
+    // const metadata = {
+    //   email: data.email,
+    //   isOwner: data.isOwner
+    // }
+    // if(!data.isOwner){
+    //   metadata.accountOwner = data.accountOwner,
+    //   metadata.office = data.office,
+    //   metadata.isAdmin = data.isAdmin
+    // }
+    // const postData = {
+    //   user_id: data.empId,
+    //   nickname: data.name,
+    //   profile_url: data.imageUrl,
+    //   metadata
+    // }
+    // try {
+    //   const res = await axios.post(`https://api-${APP_ID}.sendbird.com/v3/users`, postData, {
+    //     headers: {
+    //       'Api-Token': API_TOKEN
+    //     }
+    //   });
+    //   console.log("sendbird user created", res)
+    // } catch (e) {
+    //   console.error("Error adding emp to sendbird: ", e.message);
+    // }
   } catch (e) {
     console.error("Error adding emp to firebase: ", e.message);
   }
@@ -140,12 +140,12 @@ export const getUser = async (email) => {
 }
 
 export const getSimilarUsers = async (currentUser, showInternal) => {
-  const { isOwner, accountOwner, office, email } = currentUser;
+  const { isOwner, accountOwner, office, email, name } = currentUser;
   let q;
   if (isOwner) {
     if(showInternal){
       q = query(collection(db, "employees"),  
-            where("accountOwner", "==", email), 
+            where("accountOwner", "==", name), 
           );
     } else {
       q = query(collection(db, "employees"), where("isOwner", "==", true));

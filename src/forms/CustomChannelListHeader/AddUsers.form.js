@@ -12,26 +12,40 @@ export default function AddUsers(props) {
       render={(formRenderProps) => {
         const { handleSubmit, values, valid, similarUsers } = formRenderProps;
         //console.log(values);
+        const disableOtherUsers = ({currentEmail, currentOffice}) => {
+          if(values?.selectedUsers){
+            const idx = values?.selectedUsers?.findIndex(u => u.email === currentEmail);
+            if(idx > -1){
+              const thatUser = values?.selectedUsers[idx];
+              if(thatUser.office !== currentOffice)
+                return true;
+            }
+          }
+          return false;
+        }
         return (
           <form onSubmit={handleSubmit} className="add-users-form">
             <FieldArray name="selectedUsers">
               {({ fields }) => (
                 <div>
                   <ul>
-                    {similarUsers.map(user => {
-                      const { name, email, imageUrl } = user
+                    {similarUsers.map((user, idx) => {
+                      const { name, office, email, imageUrl } = user;
+                      if (disableOtherUsers({ currentEmail: email, currentOffice: office })) {
+                        return null
+                      }
                       return (
-                        <li key={email}>
+                        <li key={idx}>
                           <section className='checkbox-section'>
                             <Field
-                              id={email}
+                              id={idx}
                               name={fields.name}
                               component="input"
                               type="checkbox"
                               value={user}
                             />
                           </section>
-                          <label htmlFor={email}>
+                          <label htmlFor={idx}>
 
                           <section className='info-section'>
                             <div className="form-image-container">
@@ -41,7 +55,7 @@ export default function AddUsers(props) {
                             </div>
                             <div className='form-info-container'>
                               <p className='chat-header-form-name'>{name}</p>
-                              <p className='chat-header-form-email'>{email}</p>
+                              <p className='chat-header-form-email'>{office || email}</p>
                             </div>
                           </section>
                           </label>

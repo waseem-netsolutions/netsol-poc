@@ -23,9 +23,9 @@ const UserList = (props) => {
 }
 
 const UserItem = (props) => {
-  const { user, actionOptions, currentUser, isMembersList } = props;
+  const { user, actionOptions, currentUser, isMembersList, iAmOperator } = props;
   const { userId, nickname, profileUrl, role } = user;
-  const isOperator = role === "operator";
+  const thisIsOperator = role === "operator";
   const [showActionDots, setShowActionDots] = useState(false);
   const [showActionOptions, setShowActionOptions] = useState(false);
   const isCurrentUser = userId === currentUser?.email;
@@ -48,8 +48,8 @@ const UserItem = (props) => {
         <p className='settings-user-item-name'>{nickname} {isCurrentUser ? '(You)' : null}</p>
       </section>
       <section className='settings-user-item-action'>
-        {isMembersList && isOperator && !showActionDots && <span className='operator-test'>Operator</span>}
-        {(!isMembersList || (isMembersList && !isCurrentUser)) &&
+        {isMembersList && thisIsOperator && (isCurrentUser || !showActionDots) && <span className='operator-test'>Operator</span>}
+        {(iAmOperator && !isCurrentUser) &&
           <OutsideClickHandler
             onOutsideClick={() => setShowActionOptions(false)}
           >

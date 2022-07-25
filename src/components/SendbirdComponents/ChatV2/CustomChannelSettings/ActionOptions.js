@@ -6,8 +6,9 @@ const ActionOptions = (props) => {
   return (
     <ul>
       {options.map((op, i) => {
-        const { label, onClick: handleClick, visible = true } = op;
+        const { label, onClick: handleClick, visible = true, id } = op;
         if(!visible) return null
+        if(id === 'registerOperator' && user.role === 'operator') return null;
         return (
             <li key={`${label}-option-${i+1}`} onClick={() => handleClick({ userId, member: user })}>{label}</li>
         )

@@ -1,3 +1,4 @@
+import { uniqBy } from 'lodash';
 import React, { useState } from 'react'
 import { Accordion } from 'react-bootstrap'
 import AddUsersModal from '../../../../modals/AddUsersModal';
@@ -33,33 +34,59 @@ const AdminPanel = (props) => {
     }
     forceUpdateUI()
   }
-  const handleRemoveMember = ({ member }) => {
-    const isRemoved = channel.removeMember(member);
-    if(isRemoved)
-      console.log(member, ' - removed as member');
-    forceUpdateUI()
+  const handleRemoveMember = async ({ member }) => {
+    try {
+      await channel.banUserWithUserId(member.userId);
+      await channel.unbanUserWithUserId(member.userId);
+      if(channel.data){
+        const previousData = JSON.parse(channel.data);
+        const previousMembers = previousData?.members;
+        const updatedMembers = previousMembers.filter(m => m.email !== member.userId);
+        previousData.members = updatedMembers;
+        const updateChannelParams = {};
+        updateChannelParams.data = JSON.stringify(previousData);
+        channel.updateChannel(updateChannelParams);
+      }
+      forceUpdateUI()
+    } catch (error) {
+      console.log("error while removeing member", error);
+    }
   }
   const operatorsListActionOptions = [
     {
       label: "Dismiss operator",
+      id: "dismissOperator",
       onClick: handleRemoveOperator
     }
   ]
   const membersListActionOptions = [
     {
       label: "Register as operator",
+      id: "registerOperator",
       onClick: handleAddOperator,
-      //visible: isOperator
+      visible: isOperator
     },
     {
       label: "Remove",
-      onClick: handleRemoveMember
+      id: "remove",
+      onClick: handleRemoveMember,
+      visible: isOperator
     }
   ]
 
   const handleInviteMembers = async ({ selectedUsers = [] }) => {
     try {
       await channel.inviteWithUserIds([...selectedUsers.map(u => u.email)]);
+      const addedMembers = selectedUsers.map(u => ({ email: u.email, office: u.office, name: u.name}));
+      if(channel.data){
+        const previousData = JSON.parse(channel.data);
+        const previousMembers = previousData?.members;
+        const updatedMembers = [...previousMembers, ...addedMembers];
+        previousData.members = uniqBy(updatedMembers, 'email');
+        const updateChannelParams = {};
+        updateChannelParams.data = JSON.stringify(previousData);
+        channel.updateChannel(updateChannelParams);
+      }
       forceUpdateUI()
       console.log(selectedUsers.map(u => u.email), ' -- users invited')
     } catch (error) {
@@ -78,6 +105,7 @@ const AdminPanel = (props) => {
               actionOptions={operatorsListActionOptions}
               currentUser={currentUser}
               listName="operators-list"
+              iAmOperator={isOperator}
             />
           </Accordion.Body>
         </Accordion.Item>
@@ -89,10 +117,11 @@ const AdminPanel = (props) => {
               actionOptions={membersListActionOptions}
               currentUser={currentUser}
               listName="members-list"
+              iAmOperator={isOperator}
             />
-            <div className='accordian-btn-section'>
+            {members.length > 2 && <div className='accordian-btn-section'>
               <button className='custom-button' onClick={() => setUsersModal(true)}>Add members</button>
-            </div>
+            </div>}
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>

@@ -35,7 +35,7 @@ const Topbar = () => {
           <Navbar.Brand href="/">Logo</Navbar.Brand>
           <Nav className="me-auto">
             <Nav.Link href="/">Home</Nav.Link>   
-            <Nav.Link href="/chat">Chat</Nav.Link>
+            {/* <Nav.Link href="/chat">Chat</Nav.Link> */}
             <Nav.Link href="/chat-v2">ChatV2</Nav.Link>
           </Nav>
           <Nav>
@@ -45,8 +45,8 @@ const Topbar = () => {
             <Button onClick={handleLogout}>Signout</Button> :
             (
                 <>
-                  <Nav.Link href="/login">Login-admin</Nav.Link>
-                  <Nav.Link href="/login-other">Login-other</Nav.Link>
+                  {/* <Nav.Link href="/login">Login-admin</Nav.Link> */}
+                  <Nav.Link href="/login-other">Login</Nav.Link>
                   <Nav.Link href="/signup">Signup</Nav.Link>
                 </>
             )  

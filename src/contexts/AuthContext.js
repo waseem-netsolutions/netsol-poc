@@ -28,12 +28,12 @@ export default function AuthProvider({ children }) {
 
   async function otherLogin(email){
       const [data, err] = await getUser(email);
-      if(data.length){
-        setCurrentUser(data[0]);
-        localStorage.setItem('user', JSON.stringify(data[0]));
-        localStorage.setItem("userType", "other-user");
-      }
-      return [data, err];
+      // if(data.length){
+      //   setCurrentUser(data[0]);
+      //   localStorage.setItem('user', JSON.stringify(data[0]));
+      //   localStorage.setItem("userType", "other-user");
+      // }
+      return [data, err, setCurrentUser];
   }
 
   function logout() {

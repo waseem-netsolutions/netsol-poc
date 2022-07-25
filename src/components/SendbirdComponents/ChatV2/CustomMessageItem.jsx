@@ -22,6 +22,7 @@ const CustomMessageItem = (props) => {
     setHighlighedMessage,
     sdk
   } = props;
+  //console.log(message)
   //TODO console.log(channel.getUnreadMemberCount(message), channel.getUndeliveredMemberCount(message))
   const { highLightedMessageId } = useChannelContext();
   const [selectedMessage, setSelectedMessage] = useState(false);
@@ -53,13 +54,16 @@ const CustomMessageItem = (props) => {
   }
 
   //console.log(message)
-
-  let additionalData = {}
-  if (data) {
-    try {
-      additionalData = JSON.parse(data);
-    } catch (error) {
-      console.log("Error while parsing json data", error);
+  let officeName = '';
+  if (currentChannel.memberCount > 2) {
+    if (data) {
+      try {
+        const additionalData = JSON.parse(data);
+        //console.log(additionalData)
+        officeName = additionalData.office;
+      } catch (error) {
+        console.log("Error while parsing json data", error);
+      }
     }
   }
 
@@ -237,7 +241,7 @@ const CustomMessageItem = (props) => {
         className={`text-message-area ${isOwnMessage ? 'text-message-area-outgoing' : 'text-message-area-incoming'} ${selectedMessage ? 'highlighted-message' : ''}`}>
         <div className='user-name-container'>
           <span className='name'>{isOwnMessage ? "You" : sender.nickname}</span>
-          <span className='office'>{additionalData.office ? additionalData.office : null}</span>
+          {!!officeName && !isOwnMessage && <span className='office'>{officeName}</span>}
         </div>
         {showEditInput ? editContent : content}
         <small className='text-message-date'>{moment(createdAt).format("MMM D, YYYY [at] hh:mm A ")}</small>

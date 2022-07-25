@@ -29,6 +29,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import ViewMediaModal from '../modals/ViewMediaModal';
+import useInitCalls from '../hooks/useInitCalls';
+import DirectCallModal from '../modals/DirectCallModal';
 
 const ChatV2Page = (props) => {
   const { currentUser } = props;
@@ -45,9 +47,18 @@ const ChatV2Page = (props) => {
       uuidRef.current = uuidv4();
       const channelHandlerInstance = new GroupChannelHandler({
         onMessageReceived: (groupChannel) => {
-          const { customType } = groupChannel;
+          const { customType, data } = groupChannel;
+          let groupChannelOwner;
+          if(data){
+            groupChannelOwner = JSON.parse(data).accountOwner;
+          }
           if(showInternal && customType === "internal"){
-            updateUI(p => p + 1)
+            if(currentUser?.isOwner){
+              updateUI(p => p + 1)
+              return;
+            }
+            if(groupChannelOwner === currentUser?.accountOwner)
+              updateUI(p => p + 1)
           }
           if(!showInternal && customType === "external"){
             updateUI(p => p + 1);
@@ -78,6 +89,9 @@ const ChatV2Page = (props) => {
   const [showInternal, setShowInternal] = useState(true);
   const [showMediaModal, setShowMediaModal] = useState(false);
 
+  const [directCallModal, setDirectCallModal] = useState(false);
+  const [isAudioCall, setIsAudioCall] = useState(false);
+
   //* Query Object for ChannelList
   const [channelListQuery, setChannelListQuery] = useState({
     channelListQuery: {
@@ -89,27 +103,32 @@ const ChatV2Page = (props) => {
 
   //* Data from Custom hooks
   const { similarUsers } = useInitChatV2({ currentUser, showInternal });
+  const callsData = useInitCalls({ userId: currentUser?.email, currentChannel, setDirectCallModal, setIsAudioCall });
 
   const handleChannelSelect = channel => {
     setCurrentChannel(channel);
   }
   const handleOnBeforeSendUserMessage = (text) => {
-    const { office } = currentUser || {};
+    const channelMembers = JSON.parse(currentChannel.data)?.members;
+    const myUserData = channelMembers.filter(m => m.email === currentUser.email)?.[0];
+    const myOffice = myUserData?.office;
     const userMessageParams = {};
     const data = {
-      office
+      office: myOffice
     }
     userMessageParams.data = JSON.stringify(data);
     userMessageParams.message = text;
     return userMessageParams
   }
   const handleOnBeforeSendFileMessage = (file) => {
-    const { office } = currentUser || {};
+    const channelMembers = JSON.parse(currentChannel.data)?.members;
+    const myUserData = channelMembers.filter(m => m.email === currentUser.email)?.[0];
+    const myOffice = myUserData?.office;
     const fileMessageParam = {};
     const { type } = file;
     fileMessageParam.file = file;
     const data = {
-      office
+      office: myOffice
     }
     fileMessageParam.data = JSON.stringify(data);
     if (type.includes("image")) {
@@ -129,25 +148,33 @@ const ChatV2Page = (props) => {
     setChannelListQuery(produce(draft => {
       draft.channelListQuery.hiddenChannelFilter = "unhidden_only"
     }))
+    setCurrentChannel(null);
     setShowArchived(false);
+    setShowSettings(false);
   }
   const handleShowArchived = () => {
     setChannelListQuery(produce(draft => {
       draft.channelListQuery.hiddenChannelFilter = "hidden_only"
     }))
+    setCurrentChannel(null);
     setShowArchived(true);
+    setShowSettings(false);
   }
   const handleShowInternal = () => {
     setChannelListQuery(produce(draft => {
       draft.channelListQuery.customTypesFilter = ['internal']
     }))
+    setCurrentChannel(null);
     setShowInternal(true);
+    setShowSettings(false);
   }
   const handleShowExternal = () => {
     setChannelListQuery(produce(draft => {
       draft.channelListQuery.customTypesFilter = ['external']
     }))
+    setCurrentChannel(null);
     setShowInternal(false)
+    setShowSettings(false);
   }
   const groups = [
     {
@@ -192,6 +219,16 @@ const ChatV2Page = (props) => {
     // }
   }
   const handleSort = useCallback(allChannels => allChannels, [refresh])
+
+  const onVideoCallClick = () => {
+    setDirectCallModal(true);
+    setIsAudioCall(false);
+  }
+
+  const onAudioCallClick = () => {
+    setDirectCallModal(true);
+    setIsAudioCall(true);
+  }
   
   if(!currentUser) return null
   return (
@@ -220,6 +257,7 @@ const ChatV2Page = (props) => {
                   {...props}
                   currentChannelUrl={currentChannel?.url}
                   setCurrentChannel={setCurrentChannel}
+                  currentUser={currentUser}
                 />
               }
             />
@@ -271,7 +309,9 @@ const ChatV2Page = (props) => {
                   onSearchClick={handleSearchIconClick}
                   onSettingsClick={handleSettingIconClick}
                   onMediaClick={() => setShowMediaModal(true)}
-                  onCallClick={f => f}
+                  onAudioCallClick={onAudioCallClick}
+                  onVideoCallClick={onVideoCallClick}
+                  currentUser={currentUser}
                   channel={currentChannel}
                 />
               }
@@ -340,6 +380,12 @@ const ChatV2Page = (props) => {
             currentChannel={currentChannel}
           />
       }
+      {!!currentChannel && currentChannel.memberCount === 2 && <DirectCallModal
+        directCallModal={directCallModal}
+        setDirectCallModal={setDirectCallModal}
+        isAudioCall={isAudioCall}
+        { ...callsData }
+      />}
     </div>
   )
 }

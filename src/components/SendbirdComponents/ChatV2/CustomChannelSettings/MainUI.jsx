@@ -3,13 +3,12 @@ import { useChannelSettingsContext } from '@sendbird/uikit-react/ChannelSettings
 import ChannelProfile from '@sendbird/uikit-react/ChannelSettings/components/ChannelProfile';
 import { XLg } from 'react-bootstrap-icons';
 import AdminPanel from './AdminPanel';
-import { currentUser } from 'sendbird-calls';
 
 const MainUI = (props) => {
   const { currentUser, similarUsers } = props;
   const context = useChannelSettingsContext();
   const { onCloseClick } = context;
-  console.log(context)
+  //console.log(context)
   return (
     <>
       <div className='channel-search-header-container'>

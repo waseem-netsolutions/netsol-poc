@@ -19,15 +19,22 @@ const CustomHeader = (props) => {
     if(selectedUsersFromForm?.length === 1){
       if(sdk){
         const selectedUser = selectedUsersFromForm?.[0];
-        const { email: selectedUserEmail, imageUrl, name, office, isOwner = false } = selectedUser;
-        const { email } = currentUser;
+        const { email: selectedUserEmail, imageUrl, name, isOwner = false } = selectedUser;
+        const { email, accountOwner } = currentUser;
         const groupChannelParams = {};
         groupChannelParams.coverUrl = imageUrl;
         groupChannelParams.invitedUserIds = [selectedUserEmail]
         groupChannelParams.name = name;
         groupChannelParams.operatorUserIds = [email]
         groupChannelParams.customType = showInternal ? "internal" : "external";
-        if (!isOwner) groupChannelParams.data = JSON.stringify({ office, internal: showInternal });
+        let data = {};
+        data.members = [
+          { email: selectedUser.email, office: selectedUser.office, name: selectedUser.name},
+          { email: currentUser.email, office: selectedUser.office, name: currentUser.name }
+        ];
+        if(!isOwner) data.accountOwner = accountOwner;
+        else data.accountOwner = currentUser.name;
+        groupChannelParams.data = JSON.stringify(data);
         try {
           const channel = await sdk.groupChannel.createChannel(groupChannelParams);
           setCurrentChannel(channel);
@@ -46,14 +53,19 @@ const CustomHeader = (props) => {
   const handleStepTwo = async (values) => {
     const { groupImage, groupName } = values;
     if(sdk){
-      const { email } = currentUser;
+      const { email, accountOwner, isOwner, name: myName } = currentUser;
+      const cu = { email, name: myName, office: '' };
       const groupChannelParams = {};
       groupChannelParams.coverImage = groupImage;
       groupChannelParams.invitedUserIds = selectedUsers.map(user => user.email);
       groupChannelParams.name = groupName;
       groupChannelParams.operatorUserIds = [email]
-      groupChannelParams.customType = isOwner? "internal" : "external";
-      
+      groupChannelParams.customType = showInternal? "internal" : "external";
+      let data = {};
+      data.members = [...selectedUsers, cu].map(u => ({ email: u.email, office: u.office, name: u.name }));
+      if(!isOwner) data.accountOwner = accountOwner;
+      else data.accountOwner = myName;
+      groupChannelParams.data = JSON.stringify(data);
       try {
         const channel = await sdk.groupChannel.createChannel(groupChannelParams);
         setCurrentChannel(channel);
@@ -75,7 +87,6 @@ const CustomHeader = (props) => {
       </section>
       <section className='info'>
           <p className='name'>{name}</p>
-          <p className='office'>{office}</p>
       </section>
       <section className='action-container'>
         <div className='action' onClick={handleCreateChannelClick}>
