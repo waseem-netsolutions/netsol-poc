@@ -10,6 +10,8 @@ import ChannelListUI from '@sendbird/uikit-react/ChannelList/components/ChannelL
 import { useChannelContext, ChannelProvider } from '@sendbird/uikit-react/Channel/context';
 import ChannelUI from '@sendbird/uikit-react/Channel/components/ChannelUI';
 
+import FileViewer from '@sendbird/uikit-react/Channel/components/FileViewer';
+
 import "../styles/chat-v2.css";
 import CustomChannelListHeader from '../components/SendbirdComponents/ChatV2/CustomChannelListHeader';
 import useInitChatV2 from '../hooks/useInitChatV2';
@@ -38,32 +40,47 @@ const ChatV2Page = (props) => {
 
   const context = useSendbirdStateContext();
   const sdk = sendbirdSelectors.getSdk(context);
+  console.log(context)
 
-  const [refresh, updateUI] = useState(1);
+  const [refresh, updateChannelList] = useState(1);
   const uuidRef = useRef('');
+
+
+  const onMessageReceived = (groupChannel, message) => {
+    const { customType, data } = groupChannel;
+    console.log({customType, data});
+    let groupChannelOwner;
+    if(data){
+      try {
+        groupChannelOwner = JSON.parse(data).accountOwner;
+      } catch (error) {
+        console.log('error while parsing channel data', error)
+      }
+      if(showInternal && (customType === "internal")){
+        if(currentUser?.isOwner){ 
+          updateChannelList(p => p + 1)
+          return;
+        }
+        if(groupChannelOwner === currentUser?.accountOwner){
+          updateChannelList(p => p + 1);
+          return;
+        }
+      }
+      if(!showInternal && (customType === "external")){
+        updateChannelList(p => p + 1);
+        return;
+      }
+    } else {
+      updateChannelList(p => p + 1);
+      return;
+    }
+  }
 
   useEffect(() => {
     if(sdk?.groupChannel?.addGroupChannelHandler){
       uuidRef.current = uuidv4();
       const channelHandlerInstance = new GroupChannelHandler({
-        onMessageReceived: (groupChannel) => {
-          const { customType, data } = groupChannel;
-          let groupChannelOwner;
-          if(data){
-            groupChannelOwner = JSON.parse(data).accountOwner;
-          }
-          if(showInternal && customType === "internal"){
-            if(currentUser?.isOwner){
-              updateUI(p => p + 1)
-              return;
-            }
-            if(groupChannelOwner === currentUser?.accountOwner)
-              updateUI(p => p + 1)
-          }
-          if(!showInternal && customType === "external"){
-            updateUI(p => p + 1);
-          }
-        }
+        onMessageReceived
       });
       sdk.groupChannel.addGroupChannelHandler(uuidRef.current, channelHandlerInstance);
     }
@@ -88,6 +105,9 @@ const ChatV2Page = (props) => {
   const [showSearch, setShowSearch] = useState(false);
   const [showInternal, setShowInternal] = useState(true);
   const [showMediaModal, setShowMediaModal] = useState(false);
+
+  const [fileMessage, setFileMessage] = useState(null)
+  const [fileViewer, setFileViewer] = useState(false);
 
   const [directCallModal, setDirectCallModal] = useState(false);
   const [isAudioCall, setIsAudioCall] = useState(false);
@@ -229,6 +249,8 @@ const ChatV2Page = (props) => {
     setDirectCallModal(true);
     setIsAudioCall(true);
   }
+
+  console.log(refresh, 'refresshhhhhhhh')
   
   if(!currentUser) return null
   return (
@@ -258,6 +280,7 @@ const ChatV2Page = (props) => {
                   currentChannelUrl={currentChannel?.url}
                   setCurrentChannel={setCurrentChannel}
                   currentUser={currentUser}
+                  updateChannelList={updateChannelList}
                 />
               }
             />
@@ -303,6 +326,7 @@ const ChatV2Page = (props) => {
             onBeforeSendUserMessage={handleOnBeforeSendUserMessage}
             highlightedMessage={selectedMessage}
           >
+            {(fileViewer && fileMessage) && <FileViewer message={fileMessage} onCancel={() => setFileViewer(false)}/>}
             <ChannelUI
               renderChannelHeader={() =>
                 <CustomConversationHeader
@@ -319,8 +343,8 @@ const ChatV2Page = (props) => {
                 <CustomMessageItem
                   {...props}
                   currentUser={currentUser}
-                  setImageUrl={f => f}
-                  setImageViewer={f => f}
+                  setFileMessage={setFileMessage}
+                  setFileViewer={setFileViewer}
                   highlightedMessageId={selectedMessage}
                   setHighlighedMessage={setSelectedMessage}
                   deleteMessage={deleteMessage}
@@ -378,6 +402,8 @@ const ChatV2Page = (props) => {
             showMediaModal={showMediaModal}
             setShowMediaModal={setShowMediaModal}
             currentChannel={currentChannel}
+            setFileMessage={setFileMessage}
+            setFileViewer={setFileViewer}
           />
       }
       {!!currentChannel && currentChannel.memberCount === 2 && <DirectCallModal

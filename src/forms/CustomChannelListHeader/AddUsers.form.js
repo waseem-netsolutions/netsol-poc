@@ -55,7 +55,7 @@ export default function AddUsers(props) {
                             </div>
                             <div className='form-info-container'>
                               <p className='chat-header-form-name'>{name}</p>
-                              <p className='chat-header-form-email'>{office || email}</p>
+                              <p className='chat-header-form-email'>{office || 'Account Owner'}</p>
                             </div>
                           </section>
                           </label>

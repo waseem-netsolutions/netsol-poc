@@ -8,7 +8,13 @@ import Tabs from 'react-bootstrap/Tabs';
 const MESSAGES_LIMIT = 5;
 
 const ViewMediaModal = (props) => {
-  const { currentChannel, showMediaModal,  setShowMediaModal } = props;
+  const { 
+    currentChannel, 
+    showMediaModal,  
+    setShowMediaModal,
+    setFileMessage,
+    setFileViewer
+  } = props;
   const [getMessagesQuery, setGetMessageQuery] = useState({});
   const [messages, setMessages] = useState([]);
   const [hasMore, setHasMore] = useState(true);
@@ -84,6 +90,10 @@ const ViewMediaModal = (props) => {
   const docsSelected = selectedTab === "document";
   const vidsSelected = selectedTab === "video";
 
+  const handleImageClick = (message) => {
+    setFileMessage(message);
+    setFileViewer(true)
+  }
   let modalContent;
   if(imagesSelected){
     modalContent = (
@@ -95,7 +105,7 @@ const ViewMediaModal = (props) => {
             thumbUrl = thumbnails?.[0]?.url;
           }
           return (
-            <div key={"image-" + i} style={{ padding: "2px"}}>
+            <div key={"image-" + i} style={{ padding: "2px", cursor: 'pointer'}} onClick={() => handleImageClick(it)}>
               <img width="250" height="250" src={thumbUrl || url} alt={"image"} />
             </div>
           )

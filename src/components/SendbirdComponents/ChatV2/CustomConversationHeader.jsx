@@ -19,7 +19,7 @@ const CustomConversationHeader = (props) => {
     const customMembers = JSON.parse(data)?.members || [];
     const otherUser = customMembers?.filter(mem => mem.email !== currentUser.email)?.[0];
     channelName = otherUser?.name;
-    officeName = otherUser?.office;
+    officeName = otherUser?.isOwner? 'Account Owner' : otherUser?.office;
   }
   console.log(JSON.parse(channel.data))
   return (

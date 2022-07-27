@@ -14,3 +14,7 @@
 .custom-banner > h1 {
   color: white;
 }
+
+.sendbird-fileviewer__header__right__actions__delete {
+  display: none;
+}

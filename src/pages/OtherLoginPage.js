@@ -83,7 +83,7 @@ const  OtherLoginPage = () => {
           <h3 className='center-text'>Login</h3>
         </Card.Header>
         <Card.Body>
-            <Form onSubmit={handleSubmit}>
+            <Form>
               <Form.Group className='mb-3'>
                 <Form.Label htmlFor="email">Email</Form.Label>
                 <Form.Control
@@ -151,7 +151,7 @@ const  OtherLoginPage = () => {
                   <br/>
                 </>
               }
-              {step === 2 && <Button varient="primary" type="submit">Login</Button>}
+              {step === 2 && <Button varient="primary" type='button' onClick={handleSubmit}>Login</Button>}
               <Link className='btn-margin-left' to="/signup">Or Signup</Link>
           </Form>
         </Card.Body>

@@ -1,7 +1,10 @@
 import produce from 'immer';
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { Form } from 'react-bootstrap';
 import { Upload } from 'react-bootstrap-icons';
+
+const fileSizeLimitInMbs = 2
+const fileSizeLimitInBytes = fileSizeLimitInMbs * 1024 * 1024
 
 const AddGroupInfo = (props) => {
   const { onSubmit } = props
@@ -9,13 +12,12 @@ const AddGroupInfo = (props) => {
   const [groupName, setGroupName] = useState('');
   const [errors, setErrors] = useState({});
   const [imageUrl, setImageUrl] = useState('');
-  const groupNameRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!groupName){
       setErrors(produce(errors => {
-        errors.groupName = "Please provide a group name"
+        errors.groupName = "Group name is mandatory."
       }))
       return
     };
@@ -23,13 +25,24 @@ const AddGroupInfo = (props) => {
   }
   const handleGroupNameChange = (e) => {
     setErrors(produce(errors => {
-      errors.groupName = ""
+      errors.groupName = "";
+      errors.groupImage = '';
     }))
     const value = e.target.value;
     setGroupName(value)
   }
   const handleInputChange = (e) => {
+    setErrors(produce(errors => {
+      errors.groupImage = '';
+    }))
     const file = e.target.files?.[0];
+    if(!file) return
+    if(file.size > fileSizeLimitInBytes){
+      setErrors(produce(errors => {
+        errors.groupImage = `Image size greater than ${fileSizeLimitInMbs}mbs`;
+      }))
+      return;
+    }
     setGroupImage(file);
     const url = URL.createObjectURL(file);
     setImageUrl(url);
@@ -45,7 +58,7 @@ const AddGroupInfo = (props) => {
             <label htmlFor="groupImage" className='image-upload-icon'>
                 <Upload/>
             </label>
-            <input type="file" name="groupImage" id="groupImage" onChange={handleInputChange} className='upload-image-input'/>
+            <input type="file" accept='image/*' name="groupImage" id="groupImage" onChange={handleInputChange} className='upload-image-input'/>
           </div>
         </div>
       </div>
@@ -61,7 +74,8 @@ const AddGroupInfo = (props) => {
           value={groupName}
           onChange={handleGroupNameChange}
         />
-        {!!errors.groupName && <span style={{color: "red"}}>{errors.groupName}</span>}
+        {!!errors.groupName && <div><span style={{color: "red"}}>{errors.groupName}</span></div>}
+        {!!errors.groupImage && <div><span style={{color: "red"}}>{errors.groupImage}</span></div>}
       </Form.Group>
       <div className='group-info-btn-section'>
         <button type="submit">Submit</button>

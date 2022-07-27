@@ -2,14 +2,14 @@
 import { initializeApp } from 'firebase/app';
 import axios from "axios"
 import { getAuth } from 'firebase/auth';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+//import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, orderBy } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-import { APP_ID, API_TOKEN } from "../constants/sendbird";
+import { APP_ID, API_TOKEN, sampleData } from "../constants/sendbird";
 const firebaseConfig = {
   apiKey: 'AIzaSyBzQeLEWzpIoz-7P8rXWTGBetC44K6KOkA',
   authDomain: 'test-947db.firebaseapp.com',
@@ -24,25 +24,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 //* GET FIREBASE MESSAGING INSTANCE
-const messaging = getMessaging(app);
-export const subscribeToPushNotifications = async () => {
+// const messaging = getMessaging(app);
+// export const subscribeToPushNotifications = async () => {
 
-  try {
-    const currentToken = await getToken(messaging, {
-      vapidKey: "BIXY-VncPL0hU3DU-1Fp_2-TEUR6qL94qCMF3zek4DPERLP1L0K2K_1FfNWhlEaBuxVJlUKTL_JIL0ptIThmI5g"
-    });
-    if(currentToken){
-      console.log({currentToken});
-    } else {
-      console.log('No registration token available. Request permission to generate one.');
-    }
-  } catch (error) {
-    console.log('An error occurred while retrieving token. ', error);
-  }
-}
-export const setOnMessageListener = (callback) => {
-  onMessage(messaging, callback)
-}
+//   try {
+//     const currentToken = await getToken(messaging, {
+//       vapidKey: "BIXY-VncPL0hU3DU-1Fp_2-TEUR6qL94qCMF3zek4DPERLP1L0K2K_1FfNWhlEaBuxVJlUKTL_JIL0ptIThmI5g"
+//     });
+//     if(currentToken){
+//       console.log({currentToken});
+//     } else {
+//       console.log('No registration token available. Request permission to generate one.');
+//     }
+//   } catch (error) {
+//     console.log('An error occurred while retrieving token. ', error);
+//   }
+// }
+// export const setOnMessageListener = (callback) => {
+//   onMessage(messaging, callback)
+// }
+////////////////////////////////////////////////////////////
 
 export const db = getFirestore(app);
 
@@ -171,6 +172,19 @@ export const getSimilarUsers = async (currentUser, showInternal) => {
     querySnapshot.forEach((doc) => {
       dataArr.push({ ...doc.data(), docId: doc.id })
     });
+    if(!isOwner && showInternal){
+      const owner = sampleData.find(u => u.name === accountOwner);
+      if(owner){
+        dataArr.push({
+          name: owner.name,
+          email: owner.email,
+          imageUrl: owner.imageUrl,
+          office: '',
+          isOwner: true
+        });
+        return [dataArr, null];
+      }
+    }
     return [dataArr, null];
   } catch (err) {
     console.error("***GEt owner error", err.message);

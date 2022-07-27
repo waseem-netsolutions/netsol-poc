@@ -165,7 +165,8 @@ const DirectCallModal = (props) => {
         <div className="container">
           { callingState.errorMsg? <p style={{color: "red"}}>{callingState.errorMsg}</p> : null }
           {
-            !isAudioCall && callingState.status == calls.CONNECTED &&
+            // Screen sharing is not requirement
+            false && !isAudioCall && callingState.status == calls.CONNECTED &&
             <div>
               <button className="btn btn-primary m-2" onClick={screenShare}> Screen share </button>
               <button className="btn btn-primary m-2" onClick={screenShareStop}> Stop screen share </button>

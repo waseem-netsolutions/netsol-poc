@@ -16,8 +16,8 @@ const CustomMessageItem = (props) => {
     currentUser,
     deleteMessage,
     updateUserMessage,
-    setImageUrl,
-    setImageViewer,
+    setFileMessage,
+    setFileViewer,
     currentChannel,
     setHighlighedMessage,
     sdk
@@ -32,6 +32,7 @@ const CustomMessageItem = (props) => {
   const [updatedMessage, setUpdatedMessage] = useState("");
   const [playVideo, setPlayVideo] = useState(false);
   const isMounted = useMounted();
+  const [, forceRefresh] = useState();
   const {
     createdAt,
     updatedAt,
@@ -55,15 +56,14 @@ const CustomMessageItem = (props) => {
 
   //console.log(message)
   let officeName = '';
-  if (currentChannel.memberCount > 2) {
-    if (data) {
-      try {
-        const additionalData = JSON.parse(data);
-        //console.log(additionalData)
-        officeName = additionalData.office;
-      } catch (error) {
-        console.log("Error while parsing json data", error);
-      }
+  let additionalData;
+  if (data) {
+    try {
+      additionalData = JSON.parse(data);
+      //console.log(additionalData)
+      officeName = additionalData.office;
+    } catch (error) {
+      console.log("Error while parsing json data", error);
     }
   }
 
@@ -95,6 +95,26 @@ const CustomMessageItem = (props) => {
     setShowMessageOptions(!showMessageOptions)
   }
 
+  const handleDeleteMessageForMe = async () => {
+    setShowMessageOptions(false);
+    try {
+      const params = {};
+      let msgData = {}
+      if(additionalData){
+        msgData = {
+          ...additionalData,
+        }
+      }
+      msgData.deleted = true;
+      params.data = JSON.stringify(msgData);
+      await currentChannel.updateUserMessage(messageId, params);
+      await currentChannel.refresh();
+      console.log("Message Deleted for me");
+    } catch (error) {
+      console.log("Error while deleteing a message for me", error);
+    }
+  }
+
   const handleDeleteMessage = async () => {
     setShowMessageOptions(false);
     try {
@@ -124,6 +144,14 @@ const CustomMessageItem = (props) => {
     try {
       const userMessageParams = {};
       userMessageParams.message = updatedMessage;
+      let msgData = {}
+      if(additionalData){
+        msgData = {
+          ...additionalData,
+        }
+      }
+      msgData.isEdited = true;
+      userMessageParams.data = JSON.stringify(msgData);
       await updateUserMessage(currentChannel, messageId, userMessageParams);
       console.log("Message updated");
     } catch (error) {
@@ -132,8 +160,8 @@ const CustomMessageItem = (props) => {
   }
 
   const handleImageClick = () => {
-    setImageUrl(url)
-    setImageViewer(true)
+    setFileMessage(message)
+    setFileViewer(true)
   }
 
 
@@ -147,7 +175,18 @@ const CustomMessageItem = (props) => {
   if(isOwnMessage) {
     unreadMemberCount = currentChannel.getUnreadMemberCount(message);
   }
-  
+
+  // let deletedForMe = false;
+  // if(isOwnMessage && additionalData){
+  //   deletedForMe = additionalData.deleted;
+  // }
+  // if(deletedForMe){
+  //   return null;
+  // }
+  // let isEdited = false;
+  // if(additionalData && additionalData.isEdited){
+  //   isEdited = additionalData.isEdited
+  // }
   //isOwnMessage && console.log(currentChannel.getUnreadMemberCount(message), currentChannel.getUndeliveredMemberCount(message))
   //isOwnMessage && console.log(message);
 
@@ -177,7 +216,7 @@ const CustomMessageItem = (props) => {
   if (customType === 'image') {
     content = (
       <>
-        <div className='image-container' onClick={handleImageClick}>
+        <div className='image-container cursor' onClick={handleImageClick}>
           <img src={thumbnailUrl || url} alt={name} />
         </div>
         <span>{name}</span>
@@ -229,6 +268,7 @@ const CustomMessageItem = (props) => {
               <div className='message-options'>
                 <ul>
                   <li onClick={handleDeleteMessage}>Delete</li>
+                  {/* <li onClick={handleDeleteMessageForMe}>Delete {'(for me)'}</li> */}
                   {isTextMessage && <li onClick={handleEditClick}>Edit</li>}
                   {!isTextMessage && <li><a href={url}>Download</a></li>}
                 </ul>

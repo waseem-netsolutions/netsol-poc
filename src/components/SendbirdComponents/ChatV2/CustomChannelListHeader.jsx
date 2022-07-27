@@ -19,8 +19,8 @@ const CustomHeader = (props) => {
     if(selectedUsersFromForm?.length === 1){
       if(sdk){
         const selectedUser = selectedUsersFromForm?.[0];
-        const { email: selectedUserEmail, imageUrl, name, isOwner = false } = selectedUser;
-        const { email, accountOwner } = currentUser;
+        const { email: selectedUserEmail, imageUrl, name } = selectedUser;
+        const { email, accountOwner, isOwner } = currentUser;
         const groupChannelParams = {};
         groupChannelParams.coverUrl = imageUrl;
         groupChannelParams.invitedUserIds = [selectedUserEmail]
@@ -29,8 +29,8 @@ const CustomHeader = (props) => {
         groupChannelParams.customType = showInternal ? "internal" : "external";
         let data = {};
         data.members = [
-          { email: selectedUser.email, office: selectedUser.office, name: selectedUser.name},
-          { email: currentUser.email, office: selectedUser.office, name: currentUser.name }
+          { email: selectedUser.email, office: selectedUser.office, name: selectedUser.name, isOwner: selectedUser.isOwner},
+          { email: currentUser.email, office: selectedUser.office, name: currentUser.name, isOwner: currentUser.isOwner }
         ];
         if(!isOwner) data.accountOwner = accountOwner;
         else data.accountOwner = currentUser.name;
@@ -54,7 +54,7 @@ const CustomHeader = (props) => {
     const { groupImage, groupName } = values;
     if(sdk){
       const { email, accountOwner, isOwner, name: myName } = currentUser;
-      const cu = { email, name: myName, office: '' };
+      const cu = { email, name: myName, office: '', isOwner };
       const groupChannelParams = {};
       groupChannelParams.coverImage = groupImage;
       groupChannelParams.invitedUserIds = selectedUsers.map(user => user.email);
@@ -62,7 +62,7 @@ const CustomHeader = (props) => {
       groupChannelParams.operatorUserIds = [email]
       groupChannelParams.customType = showInternal? "internal" : "external";
       let data = {};
-      data.members = [...selectedUsers, cu].map(u => ({ email: u.email, office: u.office, name: u.name }));
+      data.members = [...selectedUsers, cu].map(u => ({ email: u.email, office: u.office, name: u.name, isOwner: u.isOwner }));
       if(!isOwner) data.accountOwner = accountOwner;
       else data.accountOwner = myName;
       groupChannelParams.data = JSON.stringify(data);

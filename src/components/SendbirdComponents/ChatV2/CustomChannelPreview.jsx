@@ -7,7 +7,15 @@ import { useChannelList } from '@sendbird/uikit-react/ChannelList/context';
 import '../../../styles/custom-channel-preview.css';
 
 const CustomChannelPreview = (props) => {
-    const {channel: currentChannel, onLeaveChannel, currentChannelUrl, setCurrentChannel, from = '', currentUser} = props;
+    const {
+      channel: currentChannel, 
+      onLeaveChannel, 
+      currentChannelUrl, 
+      setCurrentChannel, 
+      from = '', 
+      currentUser,
+      updateChannelList
+    } = props;
     const [showActionDots, setShowActionDots] = useState(false);
     //console.log(currentChannel)
     const [showActionOptions, setShowActionOptions] = useState(false);
@@ -26,17 +34,22 @@ const CustomChannelPreview = (props) => {
     let officeName = ''
     let channelOwner = ''
     let channelName = name;
+    let messageText = currentChannel?.lastMessage?.message || currentChannel?.lastMessage?.name;
+    if(messageText?.length > 30){
+      messageText = currentChannel?.lastMessage?.message?.slice(0, 30)?.concat(' ...')
+    }
     if(data && memberCount === 2){ 
       const customMembers = JSON.parse(data)?.members || []; 
       const otherUser = customMembers?.filter(mem => mem.email !== currentUser.email)?.[0];
-      officeName = otherUser?.office;
+      officeName = otherUser?.isOwner? 'Account Owner': otherUser?.office;
       channelName = otherUser?.name;
     }
     if(!currentUser.isOwner && data){
       channelOwner = JSON.parse(data).accountOwner;
     }
-    console.log({currentUser, channelOwner, currentChannel})
-    if(!currentUser.isOwner && currentUser.accountOwner !== channelOwner) return null
+    //Note channelOwner will be empty for non-owners
+    //console.log({currentUser, channelOwner, currentChannel})
+    if(!currentUser.isOwner && (currentUser.accountOwner !== channelOwner)) return null
   
     const activeClass = () => {
       return isActive ? 'active-channel' : ''
@@ -68,6 +81,7 @@ const CustomChannelPreview = (props) => {
         }
         await onLeaveChannel(from === 'custom-list' ? currentChannel.url : currentChannel);
         setCurrentChannel(null);
+        updateChannelList(p => p + 1)
       } catch (error) {
         handleError(error);
       }
@@ -77,6 +91,7 @@ const CustomChannelPreview = (props) => {
       try {
         await currentChannel.hide(false, false);
         setCurrentChannel(null);
+        updateChannelList(p => p + 1)
       } catch (error) {
         handleError(error)
       }
@@ -86,6 +101,7 @@ const CustomChannelPreview = (props) => {
       try {
         await currentChannel.unhide();
         setCurrentChannel(null);
+        updateChannelList(p => p + 1);
       } catch (error) {
         handleError(error);
       }
@@ -94,7 +110,9 @@ const CustomChannelPreview = (props) => {
     const handleClearHistory = async () => {
       try {
         await currentChannel.resetMyHistory();
-        //setCurrentChannel(null);
+        //const updatedChannel = await currentChannel.refresh()
+        setCurrentChannel(null);
+        updateChannelList(p => p + 1)
       } catch (error) {
         handleError(error)
       }
@@ -166,7 +184,7 @@ const CustomChannelPreview = (props) => {
           </div>}
           <div className='last-message-container'>
             <div className='last-message'>
-              <span>{currentChannel?.lastMessage?.message || currentChannel?.lastMessage?.name}</span>
+              <span>{messageText}</span>
             </div>
             {!!currentChannel.unreadMessageCount && <div className='unread-messages-count'>
               <span>

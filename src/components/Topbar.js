@@ -37,6 +37,7 @@ const Topbar = () => {
             <Nav.Link href="/">Home</Nav.Link>   
             {/* <Nav.Link href="/chat">Chat</Nav.Link> */}
             <Nav.Link href="/chat-v2">ChatV2</Nav.Link>
+            <Nav.Link href="/group-calls" target={'_blank'}>Room</Nav.Link>
           </Nav>
           <Nav>
           <Navbar.Text>{time}</Navbar.Text>

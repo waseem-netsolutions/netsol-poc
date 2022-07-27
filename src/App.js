@@ -15,7 +15,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { APP_ID, USER_ID } from "./constants/sendbird";
 import { SendBirdProvider } from '@sendbird/uikit-react';
-import { setOnMessageListener, subscribeToPushNotifications } from './util/firebase';
+import GroupCall from './pages/GroupCall/GroupCall';
+// import { setOnMessageListener, subscribeToPushNotifications } from './util/firebase';
 
 export default function App() {
   const { currentUser: contextUser } = useAuth();
@@ -53,6 +54,12 @@ export default function App() {
               <SendBirdProvider appId={APP_ID} userId={email} nickname={name} profileUrl={imageUrl}>
                 <ChatV2Page currentUser={currentUser}/>
               </SendBirdProvider>
+            </ProtectedPage>
+          }
+        />
+        <Route exact path="/group-calls" element={
+            <ProtectedPage>
+              <GroupCall currentUser={currentUser}/>
             </ProtectedPage>
           }
         />
