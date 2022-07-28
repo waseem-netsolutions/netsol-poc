@@ -7,6 +7,22 @@
   position: relative;
 }
 
+.audio-box {
+  background: #777;
+  padding: 20px;
+  color: #fff;
+  margin-bottom: 30px;
+  border-radius: 10px;
+}
+
+.audio-profile-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #777;
+  height: 250px;
+}
+
 .profile-wrapper {
   display: flex;
   justify-content: center;

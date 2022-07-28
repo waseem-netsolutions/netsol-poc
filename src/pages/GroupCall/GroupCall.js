@@ -35,7 +35,8 @@ const GroupCall = (props) => {
   const [roomStatus, setroomStatus] = useState('')
   const [selectedTab, setSelectedTab] = useState('audio');
   const [participants, setParticipants] = useState([]);
-  const [participantColors, setParticipantColors] = useState({})
+  const [participantColors, setParticipantColors] = useState({});
+  const [audioParticipantColors, setAudioParticipantColors] = useState({})
 
   useEffect(() => {
     participantVideos.forEach((pv) => {
@@ -44,6 +45,14 @@ const GroupCall = (props) => {
       }
     })
   }, [participantVideos])
+
+  useEffect(() => {
+    participants.forEach((pv) => {
+      if(!audioParticipantColors[pv.participantId]){
+        setAudioParticipantColors(p => ({...p, [pv.participantId]: getRandomColor()}))
+      }
+    })
+  }, [participants])
 
   const isAudioCall = selectedTab === 'audio';
   const { SendBirdCall, connectedToServer } = useInitGroupCalls({ currentUser });
@@ -330,13 +339,36 @@ const GroupCall = (props) => {
       { isAudioCall &&
         <div className="row">
           <audio id="audio-for-large-room" autoPlay={true}></audio>
-          {!!(room && participants?.length) && <div>
-            <h4>Participants</h4>
-            {participants.map(p => {
-              const showYou = p.user.userId === currentUser.email;
-              return <p key={p.participantId}>{p.user.nickname}{showYou? ' (You)': ''}</p>
-            })}
-          </div>}
+          {!!(room && participants?.length) &&
+            <div>
+              <h4>Participants</h4>
+              {participants.map(p => {
+                const showYou = p.user.userId === currentUser.email;
+                //<p key={p.participantId}>{p.user.nickname}{showYou ? ' (You)' : ''}</p>
+                return (
+                  <>
+                    <div className="col-md-4 custom_video_tab">
+                      <div className="audio-box">
+                        <div className="audio-profile-wrapper">
+                          <div className="profile-box" style={{ background: showYou? randomColor : audioParticipantColors[p.participantId] }}>
+                            {p.user.profileUrll ?
+                              <img src={p.user.profileUrl} alt="profile-pic" />
+                              :
+                              <span>{p.user.nickname.charAt(0)}</span>
+                            }
+                          </div>
+                        </div>
+                        <div className="participant-name-icon-container">
+                          <div>{p?.user?.nickname}{showYou? ' (You)': null}</div>
+                          <div>{p?.isAudioEnabled ? <MicFill /> : <MicMuteFill />}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )
+              })}
+            </div>
+          }
         </div>
       }
     </div>
