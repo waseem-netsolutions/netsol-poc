@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './style.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { SendBirdProvider as SBProvider } from "sendbird-uikit";
 import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';

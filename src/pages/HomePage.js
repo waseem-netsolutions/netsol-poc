@@ -56,12 +56,12 @@ export default function HomePage(props) {
   return (
     <div>
       <Topbar/>
-      <div className={`custom-banner ${currentUser? null : "banner-fullscreen"}`}>
-        <h1>{`${currentUser? `Welcome, ${currentUser.email}` : 'Please, login'}`}</h1>
+      <div className={`custom-banner ${currentUser? 'banner-fullscreen' : "banner-fullscreen"}`}>
+        <h1>{`${currentUser? `Welcome, ${currentUser.name}` : 'Please, login'}`}</h1>
       </div>
-      {currentUser? <div key={refresh}>
+      {/* {currentUser? <div key={refresh}>
         <AllEmployees refresh={refresh} setRefresh={setRefresh} setModalIsOpen={setModalIsOpen} />
-      </div> : null}
+      </div> : null} */}
       <Modal
         show={modalIsOpen}
         onHide={() => setModalIsOpen(false)}
