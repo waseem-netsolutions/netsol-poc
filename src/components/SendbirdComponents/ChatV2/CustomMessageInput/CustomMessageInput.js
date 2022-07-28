@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Paperclip, SendFill } from 'react-bootstrap-icons';
 import InputEmoji from "react-input-emoji";
 import "../../../../styles/custom-message-input.css";
@@ -16,13 +16,13 @@ const CustomMessageInput = (props) => {
   const [text, setText] = useState("");
   const [error, setError] = useState('');
 
-  const handleTextInput = (e) => {
-    const value = e.target.value;
-    error && setError('');
-    value && currentChannel?.startTyping();
-    setText(value);
+  const handleTextInput = (text) => {
+    //console.log(error, text,'error')
+    setError('');
+    text && currentChannel?.startTyping();
+    setText(text);
   }
-  const handleSend = async () => {
+  const handleSend = async (text) => {
     if (!text) return;
     currentChannel?.endTyping();
     const userMessageParams = onBeforeSendUserMessage(text);
@@ -42,20 +42,26 @@ const CustomMessageInput = (props) => {
       const fileMessageParams = onBeforeSendFileMessage(file);
       sendFileMessage(currentChannel, fileMessageParams);
     }
+    e.target.value = null;
   }
   return (
     <div>
       {!!error &&
-        <div style={{marginLeft: '10px'}}>
+        <div style={{marginLeft: '20px'}}>
           <span style={{ color: 'red', fontSize: '14px' }}>{error}</span>
         </div>
       }
       <div className='message-input-container'>
         <div className='message-input'>
-          <Form.Control as="textarea" rows={2} value={text} onChange={handleTextInput} />
-        </div>
-        <div className='send-icon-container' onClick={handleSend}>
-          <SendFill className='send-icon' />
+          <InputEmoji
+            theme="light"
+            borderRadius={5}
+            value={text}
+            onChange={handleTextInput}
+            cleanOnEnter
+            onEnter={handleSend}
+            placeholder="Type a message..."
+          />
         </div>
         <div className='attachment-input'>
           <label htmlFor="attachment">
