@@ -48,7 +48,7 @@ const Topbar = () => {
                 <>
                   {/* <Nav.Link href="/login">Login-admin</Nav.Link> */}
                   <Nav.Link href="/login-other">Login</Nav.Link>
-                  <Nav.Link href="/signup">Signup</Nav.Link>
+                  {/* <Nav.Link href="/signup">Signup</Nav.Link> */}
                 </>
             )  
           }

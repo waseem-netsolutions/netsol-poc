@@ -30,7 +30,7 @@ const CustomMessageInput = (props) => {
     setText('');
   }
   const handleAttachment = (e) => {
-    error && setError('');
+    setError('');
     const files = Array.from(e.target.files);
     if (!files.length) return;
     for (let i = 0; i < files.length; i++) {

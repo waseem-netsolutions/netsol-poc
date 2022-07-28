@@ -56,6 +56,7 @@ const GroupCall = (props) => {
 
   const isAudioCall = selectedTab === 'audio';
   const { SendBirdCall, connectedToServer } = useInitGroupCalls({ currentUser });
+
   const createRoom = () => {
     const roomParams = { roomType: isAudioCall? SendBirdCall.RoomType.LARGE_ROOM_FOR_AUDIO_ONLY : SendBirdCall.RoomType.SMALL_ROOM_FOR_VIDEO };
     SendBirdCall.createRoom(roomParams)
@@ -264,7 +265,7 @@ const GroupCall = (props) => {
             <div className="card">
               <div className='card-body'>
                 <input className='form-control' value={joinRoomInput} onChange={e => setjoinRoomInput(e.target.value)} />
-                <button className='btn btn-primary mt-2' onClick={joinRoom} disabled={!joinRoomInput}>Join Room</button>
+                <button className='btn btn-primary mt-2' onClick={joinRoom} disabled={!joinRoomInput || !connectedToServer}>Join Room</button>
               </div>
             </div>
         </div>
@@ -340,7 +341,7 @@ const GroupCall = (props) => {
         <div className="row">
           <audio id="audio-for-large-room" autoPlay={true}></audio>
           {!!(room && participants?.length) &&
-            <div>
+            <>
               <h4>Participants</h4>
               {participants.map(p => {
                 const showYou = p.user.userId === currentUser.email;
@@ -367,7 +368,7 @@ const GroupCall = (props) => {
                   </>
                 )
               })}
-            </div>
+            </>
           }
         </div>
       }
