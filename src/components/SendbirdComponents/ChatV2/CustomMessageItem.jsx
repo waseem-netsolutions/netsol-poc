@@ -24,7 +24,8 @@ const CustomMessageItem = (props) => {
   } = props;
   //console.log(message)
   //TODO console.log(channel.getUnreadMemberCount(message), channel.getUndeliveredMemberCount(message))
-  const { highLightedMessageId } = useChannelContext();
+  const { highLightedMessageId, messageActionTypes, messagesDispatcher } = useChannelContext();
+  //console.log(useChannelContext())
   const [selectedMessage, setSelectedMessage] = useState(false);
   const [showVerticalDots, setShowVerticalDots] = useState(false);
   const [showMessageOptions, setShowMessageOptions] = useState(false);
@@ -108,6 +109,10 @@ const CustomMessageItem = (props) => {
       msgData.deleted = true;
       params.data = JSON.stringify(msgData);
       await currentChannel.updateUserMessage(messageId, params);
+      messagesDispatcher({
+        type: messageActionTypes.ON_MESSAGE_DELETED,
+        payload: messageId
+      })
       await currentChannel.refresh();
       console.log("Message Deleted for me");
     } catch (error) {
@@ -176,13 +181,14 @@ const CustomMessageItem = (props) => {
     unreadMemberCount = currentChannel.getUnreadMemberCount(message);
   }
 
-  // let deletedForMe = false;
-  // if(isOwnMessage && additionalData){
-  //   deletedForMe = additionalData.deleted;
-  // }
-  // if(deletedForMe){
-  //   return null;
-  // }
+  let deletedForMe = false;
+  if(isOwnMessage && additionalData){
+    deletedForMe = additionalData.deleted;
+  }
+  
+  if(deletedForMe){
+    return null;
+  }
   // let isEdited = false;
   // if(additionalData && additionalData.isEdited){
   //   isEdited = additionalData.isEdited
